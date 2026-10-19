@@ -10,31 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
-      - name: Recuperer les fichiers
-        uses: actions/checkout@v4
-
       - name: Recuperer le depot OpenAI
-        run: |
-          git clone https://github.com/openai/NavierStokesAndEuler.git source-openai
-          cd source-openai
-          git checkout f9e8bc5b38b6e212696e8a30e3e91517af887bbd
-          cat lean-toolchain
-
-      - name: Installer Lean
-        uses: leanprover/lean-action@v1
+        uses: actions/checkout@v4
         with:
-          auto-config: false
-          toolchain: leanprover/lean4:v4.34.0-rc2
-          use-github-cache: true
+          repository: openai/NavierStokesAndEuler
+          ref: f9e8bc5b38b6e212696e8a30e3e91517af887bbd
 
-      - name: Compiler le projet OpenAI
+      - name: Installer elan
         shell: bash
         run: |
           set -euo pipefail
-          cd source-openai
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
+          sh elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Compiler OpenAI
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat lean-toolchain
           lean --version
+          lake --version
           lake exe cache get
-          lake build 2>&1 | tee ../lean-build.log
+          lake build 2>&1 | tee lean-build.log
 
       - name: Conserver les journaux
         if: always()
