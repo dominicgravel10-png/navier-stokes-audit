@@ -1,0 +1,42 @@
+name: Audit Navier-Stokes
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Recuperer les fichiers
+        uses: actions/checkout@v4
+
+      - name: Installer Lean
+        uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          use-github-cache: true
+
+      - name: Recuperer le depot OpenAI
+        run: |
+          git clone https://github.com/openai/NavierStokesAndEuler.git source-openai
+          cd source-openai
+          git checkout f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+
+      - name: Compiler le projet OpenAI
+        shell: bash
+        run: |
+          set -o pipefail
+          cd source-openai
+          lake exe cache get
+          lake build 2>&1 | tee ../lean-build.log
+
+      - name: Conserver les journaux
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journaux-lean
+          path: lean-build.log
+          if-no-files-found: warn
