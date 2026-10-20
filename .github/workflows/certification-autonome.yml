@@ -1,0 +1,91 @@
+name: Certification Navier-Stokes - audit autonome
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/certification-autonome.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit autonome Lean
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Installer elan
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
+          sh elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Compiler le projet
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat lean-toolchain
+          lean --version
+          lake --version
+          lake exe cache get
+          lake build 2>&1 | tee lean-build.log
+
+      - name: Rechercher les preuves incompletes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' | tee sorry-audit.log
+          from pathlib import Path
+          import re
+          excluded = {'.lake', '.git'}
+          hits = []
+          for p in Path('.').rglob('*.lean'):
+              if any(part in excluded for part in p.parts):
+                  continue
+              for i, line in enumerate(p.read_text(errors='replace').splitlines(), 1):
+                  if re.search(r'\b(sorry|admit|sorryAx)\b', line):
+                      hits.append(f'{p}:{i}: {line.strip()}')
+          print('\n'.join(hits) if hits else 'Aucun marqueur trouve par recherche textuelle.')
+          print(f'Total lignes correspondantes: {len(hits)}')
+          PY
+
+      - name: Controle des axiomes et enonces
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('audit/AuditTargets.lean')
+          p.write_text('''import NavierStokes.ProblemStatement
+import NavierStokes.R3.ProblemStatement
+
+#print axioms NavierStokes.ProblemStatement
+''')
+          PY
+          if lake env lean audit/AuditTargets.lean > audit/axioms.log 2>&1; then
+            echo "Controle termine."
+          else
+            echo "Cible illustrative non resolue; voir axioms.log."
+            cat audit/axioms.log
+            exit 1
+          fi
+
+      - name: Conserver les journaux
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-autonome-journaux
+          path: |
+            lean-build.log
+            sorry-audit.log
+            audit/
+          if-no-files-found: warn
