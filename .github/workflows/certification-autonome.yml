@@ -3,89 +3,102 @@ name: Certification Navier-Stokes - audit autonome
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - ".github/workflows/certification-autonome.yml"
+      - '.github/workflows/certification-autonome.yml'
 
 permissions:
   contents: read
 
 jobs:
   audit:
-    name: Audit autonome Lean
+    name: Diagnostic Lean et inventaire des axiomes
     runs-on: ubuntu-latest
     timeout-minutes: 240
-
     steps:
       - name: Recuperer le depot
         uses: actions/checkout@v4
 
-      - name: Installer elan
+      - name: Installer Lean via elan
         shell: bash
         run: |
           set -euo pipefail
-          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
-          sh elan-init.sh -y --default-toolchain none
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Compiler le projet
+      - name: Versions et dependances
         shell: bash
         run: |
           set -euo pipefail
-          cat lean-toolchain
-          lean --version
-          lake --version
+          export PATH="$HOME/.elan/bin:$PATH"
+          lean --version | tee lean-version.log
+          lake --version | tee lake-version.log
+          cat lean-toolchain | tee lean-toolchain-audit.log
+          if test -f lake-manifest.json; then
+            cp lake-manifest.json lake-manifest-audit.json
+          fi
+
+      - name: Compiler le depot
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.elan/bin:$PATH"
           lake exe cache get
           lake build 2>&1 | tee lean-build.log
 
-      - name: Rechercher les preuves incompletes
+      - name: Inventorier les marqueurs et declarations
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY' | tee sorry-audit.log
+          python3 - <<'PY' | tee audit-inventaire.log
           from pathlib import Path
           import re
-          excluded = {'.lake', '.git'}
+
           hits = []
-          for p in Path('.').rglob('*.lean'):
-              if any(part in excluded for part in p.parts):
+          decls = []
+          for p in sorted(Path('.').rglob('*.lean')):
+              if any(part in {'.git', '.lake'} for part in p.parts):
                   continue
-              for i, line in enumerate(p.read_text(errors='replace').splitlines(), 1):
+              for number, line in enumerate(p.read_text(encoding='utf-8', errors='replace').splitlines(), 1):
                   if re.search(r'\b(sorry|admit|sorryAx)\b', line):
-                      hits.append(f'{p}:{i}: {line.strip()}')
-          print('\n'.join(hits) if hits else 'Aucun marqueur trouve par recherche textuelle.')
+                      hits.append(f'{p}:{number}: {line.strip()}')
+                  if re.match(r'^\s*(?:private\s+|protected\s+)?(?:theorem|lemma)\s+', line):
+                      decls.append(f'{p}:{number}: {line.strip()}')
+          print('=== Marqueurs textuels (a examiner, faux positifs possibles) ===')
+          print('\n'.join(hits) if hits else 'Aucun marqueur textuel trouve.')
           print(f'Total lignes correspondantes: {len(hits)}')
+          print('\n=== Declarations theorem/lemma (inventaire partiel) ===')
+          print('\n'.join(decls) if decls else 'Aucune declaration detectee.')
+          print(f'Total declarations detectees: {len(decls)}')
           PY
 
-      - name: Controle des axiomes et enonces
+      - name: Verification des cibles formelles
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p audit
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('audit/AuditTargets.lean')
-          p.write_text('''import NavierStokes.ProblemStatement
-import NavierStokes.R3.ProblemStatement
-
-#print axioms NavierStokes.ProblemStatement
-''')
-          PY
-          if lake env lean audit/AuditTargets.lean > audit/axioms.log 2>&1; then
-            echo "Controle termine."
+          export PATH="$HOME/.elan/bin:$PATH"
+          if test -f audit/AuditTargets.lean; then
+            lake env lean audit/AuditTargets.lean 2>&1 | tee audit-axiomes.log
           else
-            echo "Cible illustrative non resolue; voir axioms.log."
-            cat audit/axioms.log
-            exit 1
+            printf '%s\n' \
+              'NON VERIFIE : audit/AuditTargets.lean absent.' \
+              'Ajouter dans ce fichier les imports et #check / #print axioms' \
+              'des declarations finales exactes avant de revendiquer un audit des axiomes.' \
+              | tee audit-axiomes.log
           fi
 
       - name: Conserver les journaux
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: audit-autonome-journaux
-          path: |
-            lean-build.log
-            sorry-audit.log
-            audit/
+          name: journaux-certification-autonome
           if-no-files-found: warn
+          path: |
+            lean-version.log
+            lake-version.log
+            lean-toolchain-audit.log
+            lake-manifest-audit.json
+            lean-build.log
+            audit-inventaire.log
+            audit-axiomes.log
