@@ -1,22 +1,36 @@
-name: Audit Navier-Stokes
+name: Audit Navier-Stokes — quatre controles
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  verification:
+  audit:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
-      - name: Recuperer le depot OpenAI
+      - name: Sources OpenAI (commit fixe)
         uses: actions/checkout@v4
         with:
           repository: openai/NavierStokesAndEuler
           ref: f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+          path: openai-src
 
-      - name: Installer elan
+      - name: Scripts de l'audit (branche courante)
+        uses: actions/checkout@v4
+        with:
+          path: audit
+
+      - name: Reference DeepMind (commit fixe)
+        uses: actions/checkout@v4
+        with:
+          repository: google-deepmind/formal-conjectures
+          ref: 8bf45ed
+          path: deepmind
+
+      - name: Installer Lean
         shell: bash
         run: |
           set -euo pipefail
@@ -24,20 +38,71 @@ jobs:
           sh elan-init.sh -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Compiler OpenAI
+      - name: Compiler et verifier les transferts
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/journaux"
+          LOG="$GITHUB_WORKSPACE/journaux"
+          echo "OPENAI=$(git -C openai-src rev-parse HEAD)" > "$LOG/commits.txt"
+          echo "DEEPMIND=$(git -C deepmind rev-parse HEAD)" >> "$LOG/commits.txt"
+          echo "AUDIT=$(git -C audit rev-parse HEAD)" >> "$LOG/commits.txt"
+          echo "TEXTE=skipped" > "$LOG/status.env"
+          echo "TEXTE_CONTOURNEMENT=skipped" >> "$LOG/status.env"
+          echo "CACHE=failed" >> "$LOG/status.env"
+          echo "BUILD=failed" >> "$LOG/status.env"
+          echo "REFERENCE=failed" >> "$LOG/status.env"
+          echo "BRIDGE=failed" >> "$LOG/status.env"
+          echo "AXIOMS=failed" >> "$LOG/status.env"
+          cd openai-src
+          lean --version > "$LOG/lean-version.txt" 2>&1
+          lake exe cache get > "$LOG/cache.log" 2>&1
+          if [ $? -eq 0 ]; then
+            sed -i 's/^CACHE=.*/CACHE=success/' "$LOG/status.env"
+          fi
+          lake build > "$LOG/lean-build.log" 2>&1
+          if [ $? -eq 0 ]; then
+            sed -i 's/^BUILD=.*/BUILD=success/' "$LOG/status.env"
+            mkdir -p AuditRef
+            python3 ../audit/make_reference.py \
+              "../deepmind/FormalConjectures/ForMathlib/NavierStokes.lean" \
+              "../deepmind/FormalConjectures/ForMathlib/EuclideanSpace.lean" \
+              "../deepmind/FormalConjectures/ForMathlib/EuclideanSpace/ThreeDimensional.lean" \
+              AuditRef/Reference.lean > "$LOG/reference-generate.log" 2>&1
+            if [ $? -eq 0 ]; then
+              lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1
+              if [ $? -eq 0 ]; then
+                sed -i 's/^REFERENCE=.*/REFERENCE=success/' "$LOG/status.env"
+              fi
+            fi
+            lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1
+            if [ $? -eq 0 ]; then
+              sed -i 's/^BRIDGE=.*/BRIDGE=success/' "$LOG/status.env"
+            fi
+            python3 ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" > "$LOG/axioms.log" 2>&1
+            if [ $? -eq 0 ]; then
+              sed -i 's/^AXIOMS=.*/AXIOMS=success/' "$LOG/status.env"
+            fi
+          fi
+          exit 0
+
+      - name: Verdict conservateur
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
-          cat lean-toolchain
-          lean --version
-          lake --version
-          lake exe cache get
-          lake build 2>&1 | tee lean-build.log
+          mkdir -p journaux
+          if [ -f journaux/status.env ]; then
+            set -a
+            source journaux/status.env
+            set +a
+          fi
+          python3 audit/verdict.py journaux
 
-      - name: Conserver les journaux
+      - name: Conserver tous les journaux
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: journaux-lean
-          path: lean-build.log
+          name: audit-quatre-etapes
+          path: journaux/
           if-no-files-found: warn
