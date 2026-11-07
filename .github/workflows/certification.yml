@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - audit/quatre-etapes-lean
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
