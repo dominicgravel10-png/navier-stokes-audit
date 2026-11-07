@@ -2,6 +2,9 @@ name: Audit Navier-Stokes — quatre controles
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - audit/quatre-etapes-lean
 
 permissions:
   contents: read
