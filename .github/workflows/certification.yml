@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: google-deepmind/formal-conjectures
-          ref: 8bf45ed
+          ref: 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
           path: deepmind
 
       - name: Installer Lean
