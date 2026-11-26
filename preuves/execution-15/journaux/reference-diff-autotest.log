@@ -1,0 +1,12 @@
+OK  fichier authentique accepté
+OK  falsification rejetée : temps strict dans l'équation
+OK  falsification rejetée : axiome ajouté
+OK  falsification rejetée : notation ℝ³ altérée
+OK  falsification rejetée : champ d'énergie neutralisé
+OK  falsification rejetée : énoncé (C) affaibli
+OK  falsification rejetée : sorry réintroduit
+OK  falsification rejetée : set_option ajouté
+OK  falsification rejetée : preuve modifiée
+OK  falsification rejetée : #print axioms retiré
+OK  falsification rejetée : attribut simp retiré
+0 échec(s)

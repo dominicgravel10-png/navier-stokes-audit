@@ -1,0 +1,17 @@
+test_archived_hashes_match (test_historical_execution_13.HistoricalExecution13Tests.test_archived_hashes_match) ... ok
+test_historical_axiom_snapshot_has_exact_nine_theorems (test_historical_execution_13.HistoricalExecution13Tests.test_historical_axiom_snapshot_has_exact_nine_theorems) ... ok
+test_autotest_requires_all_ten_named_negative_cases (test_validation.ValidationRegressionTests.test_autotest_requires_all_ten_named_negative_cases) ... ok
+test_bare_ok_true_is_not_a_reference_certificate (test_validation.ValidationRegressionTests.test_bare_ok_true_is_not_a_reference_certificate) ... ok
+test_classical_theorem_allowlist_is_separate_and_exact (test_validation.ValidationRegressionTests.test_classical_theorem_allowlist_is_separate_and_exact) ... ok
+test_duplicate_manifest_paths_are_rejected (test_validation.ValidationRegressionTests.test_duplicate_manifest_paths_are_rejected) ... ok
+test_fake_manifest_and_wrong_digest_are_rejected (test_validation.ValidationRegressionTests.test_fake_manifest_and_wrong_digest_are_rejected) ... ok
+test_full_v2_counterexample_cannot_certify_in_v3 (test_validation.ValidationRegressionTests.test_full_v2_counterexample_cannot_certify_in_v3) ... ok
+test_installer_source_and_digest_are_bound_to_pinned_script (test_validation.ValidationRegressionTests.test_installer_source_and_digest_are_bound_to_pinned_script) ... ok
+test_reference_reports_reject_fake_hashes_and_nonempty_problem_claims (test_validation.ValidationRegressionTests.test_reference_reports_reject_fake_hashes_and_nonempty_problem_claims) ... ok
+test_theorem_report_rejects_missing_extra_and_nonstandard_axiom (test_validation.ValidationRegressionTests.test_theorem_report_rejects_missing_extra_and_nonstandard_axiom) ... ok
+test_zero_or_unbound_audit_commit_is_rejected (test_validation.ValidationRegressionTests.test_zero_or_unbound_audit_commit_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.077s
+
+OK

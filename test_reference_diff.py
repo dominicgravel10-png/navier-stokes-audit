@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
-"""Autotest de check_reference_diff.py : le contrôle doit ACCEPTER le Reference.lean
-réellement généré et REJETER chacune des falsifications ci-dessous.
-
-Usage : test_reference_diff.py CHECKER.py ORIGINAL.lean EUCLIDEAN.lean 3D.lean REFERENCE.lean
-Code de sortie 0 seulement si tous les cas se comportent comme attendu.
-"""
+"""Régression permanente : le contrôle rejette dix falsifications de Reference.lean."""
+import json
 import pathlib
 import subprocess
 import sys
@@ -27,30 +23,47 @@ MUTATIONS = {
 
 
 def run(checker, orig, eucl, d3, ref, tmp):
-    r = subprocess.run([sys.executable, "-I", checker, orig, eucl, d3, ref, str(tmp / "r.json")],
-                       capture_output=True)
-    return r.returncode == 0
+    result = subprocess.run(
+        [sys.executable, "-I", checker, orig, eucl, d3, ref, str(tmp / "checker-report.json")],
+        capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
+    return result.returncode == 0
 
 
 def main():
+    if len(sys.argv) not in (6, 7):
+        raise SystemExit("Usage : test_reference_diff.py CHECKER ORIGINAL EUCLIDEAN 3D REFERENCE [RAPPORT.json]")
     checker, orig, eucl, d3, ref = sys.argv[1:6]
+    report_path = pathlib.Path(sys.argv[6]) if len(sys.argv) == 7 else None
     src = pathlib.Path(ref).read_text(encoding="utf-8")
     failures = 0
+    cases = []
     with tempfile.TemporaryDirectory() as d:
         tmp = pathlib.Path(d)
-        ok = run(checker, orig, eucl, d3, ref, tmp)
-        print(f"{'OK ' if ok else 'ÉCHEC'} fichier authentique accepté")
-        failures += not ok
-        for label, (a, b) in MUTATIONS.items():
-            if a not in src:
+        accepted = run(checker, orig, eucl, d3, ref, tmp)
+        print(f"{'OK ' if accepted else 'ÉCHEC'} fichier authentique accepté")
+        failures += not accepted
+        for label, (before, after) in MUTATIONS.items():
+            if before not in src:
                 print(f"ÉCHEC mutation inapplicable : {label}")
+                cases.append({"nom": label, "applicable": False, "rejetee": False})
                 failures += 1
                 continue
-            m = tmp / "mut.lean"
-            m.write_text(src.replace(a, b, 1), encoding="utf-8")
-            rejected = not run(checker, orig, eucl, d3, str(m), tmp)
+            mutated = tmp / "mutated.lean"
+            mutated.write_text(src.replace(before, after, 1), encoding="utf-8")
+            rejected = not run(checker, orig, eucl, d3, str(mutated), tmp)
             print(f"{'OK ' if rejected else 'ÉCHEC'} falsification rejetée : {label}")
+            cases.append({"nom": label, "applicable": True, "rejetee": rejected})
             failures += not rejected
+    report = {
+        "schema_version": 1,
+        "ok": failures == 0,
+        "authentique_accepte": accepted,
+        "cas": cases,
+        "nombre_falsifications": len(MUTATIONS),
+    }
+    if report_path:
+        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"{failures} échec(s)")
     sys.exit(1 if failures else 0)
 

@@ -1,0 +1,133 @@
+--- ../deepmind/FormalConjectures/Millenium/NavierStokes.lean	2026-11-26 10:43:31.387812222 +0000
++++ AuditRef/Reference.lean	2026-11-26 12:49:26.329223975 +0000
+@@ -14,7 +14,7 @@
+ limitations under the License.
+ -/
+ 
+-import FormalConjecturesUtil
++import NavierStokes.ComparatorSolution
+ 
+ /-!
+ # Existence And Smoothness Of The Navier–Stokes Equation
+@@ -56,7 +56,10 @@
+ open ContDiff Set InnerProductSpace MeasureTheory EuclideanGeometry
+ open scoped Laplacian
+ 
+-namespace NavierStokes
++local notation "ℝ^" n:65 => EuclideanSpace ℝ (Fin n)
++local notation "ℝ³" => EuclideanSpace ℝ (Fin 3)
++
++namespace AuditRef
+ 
+ variable {n : ℕ}
+ 
+@@ -76,24 +79,24 @@
+ notation "∇⬝" => divergence
+ 
+ /-- The divergence of a vector field is $0$ at points where `fderiv` has its junk value. -/
+-@[simp, category API, AMS 35]
++@[simp]
+ theorem divergence_of_not_differentiableAt {v : ℝ^n → ℝ^n} {x : ℝ^n}
+     (hv : ¬ DifferentiableAt ℝ v x) : ∇⬝ v x = 0 := by
+   simp [divergence, fderiv_zero_of_not_differentiableAt hv]
+ 
+ /-- The divergence of the zero vector field is zero. -/
+-@[simp, category API, AMS 35]
++@[simp]
+ theorem divergence_zero (x : ℝ^n) : ∇⬝ (0 : ℝ^n → ℝ^n) x = 0 := by
+   simp [divergence]
+ 
+ /-- The divergence of a constant vector field is zero. -/
+-@[simp, category API, AMS 35]
++@[simp]
+ theorem divergence_const (c : ℝ^n) (x : ℝ^n) :
+     ∇⬝ (fun _ : ℝ^n => c) x = 0 := by
+   simp [divergence]
+ 
+ /-- Divergence is additive at points where both vector fields are differentiable. -/
+-@[category API, AMS 35]
++
+ theorem divergence_add {v w : ℝ^n → ℝ^n} {x : ℝ^n}
+     (hv : DifferentiableAt ℝ v x) (hw : DifferentiableAt ℝ w x) :
+     ∇⬝ (fun y => v y + w y) x = ∇⬝ v x + ∇⬝ w x := by
+@@ -101,7 +104,7 @@
+   exact map_add _ _ _
+ 
+ /-- Divergence commutes with scalar multiplication at differentiability points. -/
+-@[category API, AMS 35]
++
+ theorem divergence_smul (c : ℝ) {v : ℝ^n → ℝ^n} {x : ℝ^n}
+     (hv : DifferentiableAt ℝ v x) : ∇⬝ (fun y => c • v y) x = c * ∇⬝ v x := by
+   rw [divergence, fderiv_fun_const_smul hv c]
+@@ -263,34 +266,52 @@
+   isOnePeriodic_pressure : ∀ t ≥ 0, IsOnePeriodic (p · t)
+ 
+ 
+-/-- (A) Existence and smoothness of Navier–Stokes solutions on ℝ³. -/
+-@[category research open, AMS 35]
+-theorem navier_stokes_existence_and_smoothness_R3 (nu : ℝ) (hnu : nu > 0)
+-    (u₀ : ℝ³ → ℝ³) (hu₀ : InitialVelocityConditionDecay u₀) :
+-    ∃ v p, NavierStokesExistenceAndSmoothnessRn nu u₀ (f := 0) v p := by
+-  sorry
+-
+-/-- (B) Existence and smoothness of Navier–Stokes solutions in ℝ³/ℤ³. -/
+-@[category research open, AMS 35]
+-theorem navier_stokes_existence_and_smoothness_periodic (nu : ℝ) (hnu : nu > 0)
+-    (u₀ : ℝ³ → ℝ³) (hu₀ : InitialVelocityConditionPeriodic u₀) :
+-    ∃ v p, NavierStokesExistenceAndSmoothnessPeriodic nu u₀ (f := 0) v p := by
+-  sorry
++
++
++
+ 
+ /-- (C) Breakdown of Navier–Stokes solutions on ℝ³. -/
+-@[category research open, AMS 35]
++
+ theorem navier_stokes_breakdown_R3 (nu : ℝ) (hnu : nu > 0) :
+     ∃ (u₀ : ℝ³ → ℝ³) (f : ℝ³ → ℝ → ℝ³),
+     InitialVelocityConditionDecay u₀ ∧ ForceConditionDecay f ∧
+     ¬ (∃ v p, NavierStokesExistenceAndSmoothnessRn nu u₀ f v p) := by
+-  sorry
++  obtain ⟨u₀, f, hu, hf, hno⟩ := NavierStokes.Comparator.navier_stokes_breakdown_R3 nu hnu
++  refine ⟨u₀, f, ?_, ?_, ?_⟩
++  · exact { div_free := hu.div_free, smooth := hu.smooth, decay := hu.decay }
++  · exact { smooth := hf.smooth, decay := hf.decay }
++  · rintro ⟨v, p, h⟩
++    exact hno ⟨v, p,
++      { navier_stokes := h.navier_stokes
++        div_free := h.div_free
++        initial_condition := h.initial_condition
++        velocity_smooth := h.velocity_smooth
++        pressure_smooth := h.pressure_smooth
++        integrable := h.integrable
++        globally_bounded_energy := h.globally_bounded_energy }⟩
+ 
+ /-- (D) Breakdown of Navier–Stokes Solutions on ℝ³/ℤ³. -/
+-@[category research open, AMS 35]
++
+ theorem navier_stokes_breakdown_periodic (nu : ℝ) (hnu : nu > 0) :
+     ∃ (u₀ : ℝ³ → ℝ³) (f : ℝ³ → ℝ → ℝ³),
+     InitialVelocityConditionPeriodic u₀ ∧ ForceConditionPeriodic f ∧
+     ¬ (∃ v p, NavierStokesExistenceAndSmoothnessPeriodic nu u₀ f v p) := by
+-  sorry
+-
+-end NavierStokes
++  obtain ⟨u₀, f, hu, hf, hno⟩ := NavierStokes.Comparator.navier_stokes_breakdown_periodic nu hnu
++  refine ⟨u₀, f, ?_, ?_, ?_⟩
++  · exact { div_free := hu.div_free, smooth := hu.smooth, isOnePeriodic := hu.isOnePeriodic }
++  · exact { smooth := hf.smooth, isOnePeriodic := hf.isOnePeriodic, decay := hf.decay }
++  · rintro ⟨v, p, h⟩
++    exact hno ⟨v, p,
++      { navier_stokes := h.navier_stokes
++        div_free := h.div_free
++        initial_condition := h.initial_condition
++        velocity_smooth := h.velocity_smooth
++        pressure_smooth := h.pressure_smooth
++        isOnePeriodic_velocity := h.isOnePeriodic_velocity
++        isOnePeriodic_pressure := h.isOnePeriodic_pressure }⟩
++
++end AuditRef
++
++-- Axiomes : seuls propext, Classical.choice et Quot.sound sont acceptés.
++#print axioms AuditRef.navier_stokes_breakdown_R3
++#print axioms AuditRef.navier_stokes_breakdown_periodic

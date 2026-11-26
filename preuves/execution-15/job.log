@@ -1,0 +1,589 @@
+﻿2026-11-26T10:43:27.5032512Z Current runner version: '2.338.2'
+2026-11-26T10:43:27.5057797Z ##[group]Runner Image Provisioner
+2026-11-26T10:43:27.5058642Z Hosted Compute Agent
+2026-11-26T10:43:27.5059231Z Version: 20261111.635
+2026-11-26T10:43:27.5060009Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-26T10:43:27.5060754Z Build Date: 2026-11-11T01:49:01Z
+2026-11-26T10:43:27.5061476Z Worker ID: {63e874b9-3850-4d22-9061-a3b7555ffd09}
+2026-11-26T10:43:27.5062188Z Region: eastus
+2026-11-26T10:43:27.5062712Z Cloud: Azure
+2026-11-26T10:43:27.5063615Z ##[endgroup]
+2026-11-26T10:43:27.5065511Z ##[group]Operating System
+2026-11-26T10:43:27.5066246Z Ubuntu
+2026-11-26T10:43:27.5066769Z 26.04.1
+2026-11-26T10:43:27.5067262Z LTS
+2026-11-26T10:43:27.5067923Z ##[endgroup]
+2026-11-26T10:43:27.5068473Z ##[group]Runner Image
+2026-11-26T10:43:27.5069137Z Image: ubuntu-26.04
+2026-11-26T10:43:27.5069708Z Version: 20261116.202.1
+2026-11-26T10:43:27.5071052Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-26T10:43:27.5072625Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+2026-11-26T10:43:27.5074026Z ##[endgroup]
+2026-11-26T10:43:27.5075119Z ##[group]GITHUB_TOKEN Permissions
+2026-11-26T10:43:27.5077342Z Contents: read
+2026-11-26T10:43:27.5077965Z Metadata: read
+2026-11-26T10:43:27.5078606Z ##[endgroup]
+2026-11-26T10:43:27.5080656Z Secret source: Actions
+2026-11-26T10:43:27.5081730Z Cache mode: write
+2026-11-26T10:43:27.5082780Z Prepare workflow directory
+2026-11-26T10:43:27.5414376Z Prepare all required actions
+2026-11-26T10:43:27.5463199Z Getting action download info
+2026-11-26T10:43:27.6946355Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-26T10:43:27.7947522Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-26T10:43:28.0038359Z Complete job name: audit
+2026-11-26T10:43:28.0967092Z ##[group]Run actions/checkout@v4
+2026-11-26T10:43:28.0968005Z with:
+2026-11-26T10:43:28.0968478Z   repository: openai/NavierStokesAndEuler
+2026-11-26T10:43:28.0969106Z   ref: f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+2026-11-26T10:43:28.0969697Z   path: openai-src
+2026-11-26T10:43:28.0974130Z   token: ***
+2026-11-26T10:43:28.0974584Z   ssh-strict: true
+2026-11-26T10:43:28.0975022Z   ssh-user: git
+2026-11-26T10:43:28.0975465Z   persist-credentials: true
+2026-11-26T10:43:28.0976112Z   clean: true
+2026-11-26T10:43:28.0976566Z   sparse-checkout-cone-mode: true
+2026-11-26T10:43:28.0977085Z   fetch-depth: 1
+2026-11-26T10:43:28.0977516Z   fetch-tags: false
+2026-11-26T10:43:28.0977957Z   show-progress: true
+2026-11-26T10:43:28.0978569Z   lfs: false
+2026-11-26T10:43:28.0978992Z   submodules: false
+2026-11-26T10:43:28.0979444Z   set-safe-directory: true
+2026-11-26T10:43:28.0979966Z   allow-unsafe-pr-checkout: false
+2026-11-26T10:43:28.0980829Z ##[endgroup]
+2026-11-26T10:43:28.3535132Z Syncing repository: openai/NavierStokesAndEuler
+2026-11-26T10:43:28.3538801Z ##[group]Getting Git version info
+2026-11-26T10:43:28.3540946Z Working directory is '/home/runner/work/navier-stokes-audit/navier-stokes-audit/openai-src'
+2026-11-26T10:43:28.3544104Z [command]/usr/bin/git version
+2026-11-26T10:43:28.3545344Z git version 2.56.1
+2026-11-26T10:43:28.3562305Z ##[endgroup]
+2026-11-26T10:43:28.3579198Z Temporarily overriding HOME='/home/runner/work/_temp/be32d76d-30d5-43c6-aa7d-b6ba4eab2321' before making global git config changes
+2026-11-26T10:43:28.3582115Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T10:43:28.3584945Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/openai-src
+2026-11-26T10:43:28.3650570Z ##[group]Initializing the repository
+2026-11-26T10:43:28.3657208Z [command]/usr/bin/git init /home/runner/work/navier-stokes-audit/navier-stokes-audit/openai-src
+2026-11-26T10:43:28.3755460Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-26T10:43:28.3757614Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-26T10:43:28.3759245Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-26T10:43:28.3760508Z hint: call:
+2026-11-26T10:43:28.3761436Z hint:
+2026-11-26T10:43:28.3762542Z hint: 	git config --global init.defaultBranch <name>
+2026-11-26T10:43:28.3763839Z hint:
+2026-11-26T10:43:28.3765301Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-26T10:43:28.3767003Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-26T10:43:28.3768284Z hint:
+2026-11-26T10:43:28.3769365Z hint: 	git branch -m <name>
+2026-11-26T10:43:28.3770542Z hint:
+2026-11-26T10:43:28.3771877Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-26T10:43:28.3773255Z Initialized empty Git repository in /home/runner/work/navier-stokes-audit/navier-stokes-audit/openai-src/.git/
+2026-11-26T10:43:28.3788152Z [command]/usr/bin/git remote add origin https://github.com/openai/NavierStokesAndEuler
+2026-11-26T10:43:28.3841459Z ##[endgroup]
+2026-11-26T10:43:28.3843970Z ##[group]Disabling automatic garbage collection
+2026-11-26T10:43:28.3845801Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-26T10:43:28.3887289Z ##[endgroup]
+2026-11-26T10:43:28.3889221Z ##[group]Setting up auth
+2026-11-26T10:43:28.3895548Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T10:43:28.3936617Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T10:43:28.4439599Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T10:43:28.4488305Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T10:43:28.4777260Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T10:43:28.4812847Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T10:43:28.5095935Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-26T10:43:28.5193153Z ##[endgroup]
+2026-11-26T10:43:28.5194713Z ##[group]Fetching the repository
+2026-11-26T10:43:28.5196546Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+2026-11-26T10:43:29.9497467Z From https://github.com/openai/NavierStokesAndEuler
+2026-11-26T10:43:29.9500205Z  * branch            f9e8bc5b38b6e212696e8a30e3e91517af887bbd -> FETCH_HEAD
+2026-11-26T10:43:29.9505728Z ##[endgroup]
+2026-11-26T10:43:29.9507070Z ##[group]Determining the checkout info
+2026-11-26T10:43:29.9508486Z ##[endgroup]
+2026-11-26T10:43:29.9510832Z [command]/usr/bin/git sparse-checkout disable
+2026-11-26T10:43:29.9569709Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-26T10:43:29.9601667Z ##[group]Checking out the ref
+2026-11-26T10:43:29.9603226Z [command]/usr/bin/git checkout --progress --force f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+2026-11-26T10:43:30.1883858Z Note: switching to 'f9e8bc5b38b6e212696e8a30e3e91517af887bbd'.
+2026-11-26T10:43:30.1884535Z 
+2026-11-26T10:43:30.1885294Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-26T10:43:30.1886298Z changes and commit them, and you can discard any commits you make in this
+2026-11-26T10:43:30.1887479Z state without impacting any branches by switching back to a branch.
+2026-11-26T10:43:30.1888222Z 
+2026-11-26T10:43:30.1889099Z If you want to create a new branch to retain commits you create, you may
+2026-11-26T10:43:30.1890119Z do so (now or later) by using -c with the switch command. Example:
+2026-11-26T10:43:30.1891142Z 
+2026-11-26T10:43:30.1891387Z   git switch -c <new-branch-name>
+2026-11-26T10:43:30.1891750Z 
+2026-11-26T10:43:30.1891984Z Or undo this operation with:
+2026-11-26T10:43:30.1892329Z 
+2026-11-26T10:43:30.1892543Z   git switch -
+2026-11-26T10:43:30.1893153Z 
+2026-11-26T10:43:30.1894070Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-26T10:43:30.1894806Z 
+2026-11-26T10:43:30.1895021Z HEAD is now at f9e8bc5 .
+2026-11-26T10:43:30.1899522Z ##[endgroup]
+2026-11-26T10:43:30.1950601Z [command]/usr/bin/git log -1 --format=%H
+2026-11-26T10:43:30.1976809Z f9e8bc5b38b6e212696e8a30e3e91517af887bbd
+2026-11-26T10:43:30.2265721Z ##[group]Run actions/checkout@v4
+2026-11-26T10:43:30.2266073Z with:
+2026-11-26T10:43:30.2266326Z   path: audit
+2026-11-26T10:43:30.2266645Z   repository: dominicgravel10-png/navier-stokes-audit
+2026-11-26T10:43:30.2269206Z   token: ***
+2026-11-26T10:43:30.2269463Z   ssh-strict: true
+2026-11-26T10:43:30.2269743Z   ssh-user: git
+2026-11-26T10:43:30.2270035Z   persist-credentials: true
+2026-11-26T10:43:30.2270325Z   clean: true
+2026-11-26T10:43:30.2270593Z   sparse-checkout-cone-mode: true
+2026-11-26T10:43:30.2270895Z   fetch-depth: 1
+2026-11-26T10:43:30.2271149Z   fetch-tags: false
+2026-11-26T10:43:30.2271404Z   show-progress: true
+2026-11-26T10:43:30.2271667Z   lfs: false
+2026-11-26T10:43:30.2271905Z   submodules: false
+2026-11-26T10:43:30.2272168Z   set-safe-directory: true
+2026-11-26T10:43:30.2272463Z   allow-unsafe-pr-checkout: false
+2026-11-26T10:43:30.2272769Z ##[endgroup]
+2026-11-26T10:43:30.3116654Z Syncing repository: dominicgravel10-png/navier-stokes-audit
+2026-11-26T10:43:30.3123921Z ##[group]Getting Git version info
+2026-11-26T10:43:30.3124744Z Working directory is '/home/runner/work/navier-stokes-audit/navier-stokes-audit/audit'
+2026-11-26T10:43:30.3174086Z [command]/usr/bin/git version
+2026-11-26T10:43:30.3209995Z git version 2.56.1
+2026-11-26T10:43:30.3230949Z ##[endgroup]
+2026-11-26T10:43:30.3246086Z Temporarily overriding HOME='/home/runner/work/_temp/39cc6654-b6c3-4176-a098-6e6d04552eee' before making global git config changes
+2026-11-26T10:43:30.3248069Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T10:43:30.3251696Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/audit
+2026-11-26T10:43:30.3287253Z ##[group]Initializing the repository
+2026-11-26T10:43:30.3292697Z [command]/usr/bin/git init /home/runner/work/navier-stokes-audit/navier-stokes-audit/audit
+2026-11-26T10:43:30.3349785Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-26T10:43:30.3370238Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-26T10:43:30.3371323Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-26T10:43:30.3372168Z hint: call:
+2026-11-26T10:43:30.3372636Z hint:
+2026-11-26T10:43:30.3373242Z hint: 	git config --global init.defaultBranch <name>
+2026-11-26T10:43:30.3374141Z hint:
+2026-11-26T10:43:30.3374733Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-26T10:43:30.3377792Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-26T10:43:30.3378506Z hint:
+2026-11-26T10:43:30.3378901Z hint: 	git branch -m <name>
+2026-11-26T10:43:30.3379344Z hint:
+2026-11-26T10:43:30.3380068Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-26T10:43:30.3381198Z Initialized empty Git repository in /home/runner/work/navier-stokes-audit/navier-stokes-audit/audit/.git/
+2026-11-26T10:43:30.3383688Z [command]/usr/bin/git remote add origin https://github.com/dominicgravel10-png/navier-stokes-audit
+2026-11-26T10:43:30.3400913Z ##[endgroup]
+2026-11-26T10:43:30.3401747Z ##[group]Disabling automatic garbage collection
+2026-11-26T10:43:30.3405804Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-26T10:43:30.3446188Z ##[endgroup]
+2026-11-26T10:43:30.3446970Z ##[group]Setting up auth
+2026-11-26T10:43:30.3449418Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T10:43:30.3488729Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T10:43:30.3799336Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T10:43:30.3837334Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T10:43:30.4139865Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T10:43:30.4176943Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T10:43:30.4452740Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-26T10:43:30.4494804Z ##[endgroup]
+2026-11-26T10:43:30.4495702Z ##[group]Fetching the repository
+2026-11-26T10:43:30.4505687Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +bcd68a5121f2b90697c73d958e6251f6fa150758:refs/remotes/pull/1/merge
+2026-11-26T10:43:30.6168551Z From https://github.com/dominicgravel10-png/navier-stokes-audit
+2026-11-26T10:43:30.6169426Z  * [new ref]         bcd68a5121f2b90697c73d958e6251f6fa150758 -> pull/1/merge
+2026-11-26T10:43:30.6174352Z ##[endgroup]
+2026-11-26T10:43:30.6174813Z ##[group]Determining the checkout info
+2026-11-26T10:43:30.6177238Z ##[endgroup]
+2026-11-26T10:43:30.6183175Z [command]/usr/bin/git sparse-checkout disable
+2026-11-26T10:43:30.6228121Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-26T10:43:30.6258984Z ##[group]Checking out the ref
+2026-11-26T10:43:30.6263094Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1/merge
+2026-11-26T10:43:30.6309244Z Note: switching to 'refs/remotes/pull/1/merge'.
+2026-11-26T10:43:30.6309739Z 
+2026-11-26T10:43:30.6310876Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-26T10:43:30.6311775Z changes and commit them, and you can discard any commits you make in this
+2026-11-26T10:43:30.6312614Z state without impacting any branches by switching back to a branch.
+2026-11-26T10:43:30.6313112Z 
+2026-11-26T10:43:30.6313681Z If you want to create a new branch to retain commits you create, you may
+2026-11-26T10:43:30.6314506Z do so (now or later) by using -c with the switch command. Example:
+2026-11-26T10:43:30.6314979Z 
+2026-11-26T10:43:30.6315094Z   git switch -c <new-branch-name>
+2026-11-26T10:43:30.6315286Z 
+2026-11-26T10:43:30.6315393Z Or undo this operation with:
+2026-11-26T10:43:30.6315580Z 
+2026-11-26T10:43:30.6315686Z   git switch -
+2026-11-26T10:43:30.6315870Z 
+2026-11-26T10:43:30.6316112Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-26T10:43:30.6316435Z 
+2026-11-26T10:43:30.6316808Z HEAD is now at bcd68a5 Merge b0e62eda6ad56a2a7b7987cb5ea39fbbac2bf45e into 6d74dd2514e7a07ad5b4ca517d3e93fee6023594
+2026-11-26T10:43:30.6318403Z ##[endgroup]
+2026-11-26T10:43:30.6355176Z [command]/usr/bin/git log -1 --format=%H
+2026-11-26T10:43:30.6383738Z bcd68a5121f2b90697c73d958e6251f6fa150758
+2026-11-26T10:43:30.6580616Z ##[group]Run actions/checkout@v4
+2026-11-26T10:43:30.6580903Z with:
+2026-11-26T10:43:30.6581137Z   repository: google-deepmind/formal-conjectures
+2026-11-26T10:43:30.6581472Z   ref: 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
+2026-11-26T10:43:30.6581757Z   path: deepmind
+2026-11-26T10:43:30.6584391Z   token: ***
+2026-11-26T10:43:30.6584608Z   ssh-strict: true
+2026-11-26T10:43:30.6584823Z   ssh-user: git
+2026-11-26T10:43:30.6585038Z   persist-credentials: true
+2026-11-26T10:43:30.6585454Z   clean: true
+2026-11-26T10:43:30.6585664Z   sparse-checkout-cone-mode: true
+2026-11-26T10:43:30.6585919Z   fetch-depth: 1
+2026-11-26T10:43:30.6586119Z   fetch-tags: false
+2026-11-26T10:43:30.6586325Z   show-progress: true
+2026-11-26T10:43:30.6586534Z   lfs: false
+2026-11-26T10:43:30.6586723Z   submodules: false
+2026-11-26T10:43:30.6586927Z   set-safe-directory: true
+2026-11-26T10:43:30.6587177Z   allow-unsafe-pr-checkout: false
+2026-11-26T10:43:30.6587425Z ##[endgroup]
+2026-11-26T10:43:30.7456093Z Syncing repository: google-deepmind/formal-conjectures
+2026-11-26T10:43:30.7457047Z ##[group]Getting Git version info
+2026-11-26T10:43:30.7457802Z Working directory is '/home/runner/work/navier-stokes-audit/navier-stokes-audit/deepmind'
+2026-11-26T10:43:30.7482292Z [command]/usr/bin/git version
+2026-11-26T10:43:30.7532207Z git version 2.56.1
+2026-11-26T10:43:30.7553244Z ##[endgroup]
+2026-11-26T10:43:30.7567064Z Temporarily overriding HOME='/home/runner/work/_temp/bc7332c5-e9f2-42bc-a243-6d9a9aa5122e' before making global git config changes
+2026-11-26T10:43:30.7568589Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T10:43:30.7572217Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/deepmind
+2026-11-26T10:43:30.7607982Z ##[group]Initializing the repository
+2026-11-26T10:43:30.7612854Z [command]/usr/bin/git init /home/runner/work/navier-stokes-audit/navier-stokes-audit/deepmind
+2026-11-26T10:43:30.7659805Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-26T10:43:30.7661685Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-26T10:43:30.7662704Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-26T10:43:30.7663755Z hint: call:
+2026-11-26T10:43:30.7664276Z hint:
+2026-11-26T10:43:30.7664837Z hint: 	git config --global init.defaultBranch <name>
+2026-11-26T10:43:30.7665508Z hint:
+2026-11-26T10:43:30.7666176Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-26T10:43:30.7667900Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-26T10:43:30.7668736Z hint:
+2026-11-26T10:43:30.7669212Z hint: 	git branch -m <name>
+2026-11-26T10:43:30.7669799Z hint:
+2026-11-26T10:43:30.7670488Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-26T10:43:30.7672504Z Initialized empty Git repository in /home/runner/work/navier-stokes-audit/navier-stokes-audit/deepmind/.git/
+2026-11-26T10:43:30.7675119Z [command]/usr/bin/git remote add origin https://github.com/google-deepmind/formal-conjectures
+2026-11-26T10:43:30.7708662Z ##[endgroup]
+2026-11-26T10:43:30.7709347Z ##[group]Disabling automatic garbage collection
+2026-11-26T10:43:30.7714235Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-26T10:43:30.7750694Z ##[endgroup]
+2026-11-26T10:43:30.7751297Z ##[group]Setting up auth
+2026-11-26T10:43:30.7758331Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T10:43:30.7793024Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T10:43:30.8123126Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T10:43:30.8162802Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T10:43:30.8466947Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T10:43:30.8503233Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T10:43:30.8778819Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-26T10:43:30.8819555Z ##[endgroup]
+2026-11-26T10:43:30.8820253Z ##[group]Fetching the repository
+2026-11-26T10:43:30.8829773Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
+2026-11-26T10:43:31.3393083Z From https://github.com/google-deepmind/formal-conjectures
+2026-11-26T10:43:31.3394159Z  * branch            8bf45ed70d48b2b2a501de9c00b26bfa38c573ee -> FETCH_HEAD
+2026-11-26T10:43:31.3398402Z ##[endgroup]
+2026-11-26T10:43:31.3398896Z ##[group]Determining the checkout info
+2026-11-26T10:43:31.3402339Z ##[endgroup]
+2026-11-26T10:43:31.3408682Z [command]/usr/bin/git sparse-checkout disable
+2026-11-26T10:43:31.3453790Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-26T10:43:31.3482644Z ##[group]Checking out the ref
+2026-11-26T10:43:31.3486875Z [command]/usr/bin/git checkout --progress --force 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
+2026-11-26T10:43:31.4180205Z Note: switching to '8bf45ed70d48b2b2a501de9c00b26bfa38c573ee'.
+2026-11-26T10:43:31.4180731Z 
+2026-11-26T10:43:31.4181075Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-26T10:43:31.4181881Z changes and commit them, and you can discard any commits you make in this
+2026-11-26T10:43:31.4182690Z state without impacting any branches by switching back to a branch.
+2026-11-26T10:43:31.4183170Z 
+2026-11-26T10:43:31.4183727Z If you want to create a new branch to retain commits you create, you may
+2026-11-26T10:43:31.4184457Z do so (now or later) by using -c with the switch command. Example:
+2026-11-26T10:43:31.4184893Z 
+2026-11-26T10:43:31.4185069Z   git switch -c <new-branch-name>
+2026-11-26T10:43:31.4185336Z 
+2026-11-26T10:43:31.4185504Z Or undo this operation with:
+2026-11-26T10:43:31.4185771Z 
+2026-11-26T10:43:31.4185918Z   git switch -
+2026-11-26T10:43:31.4186071Z 
+2026-11-26T10:43:31.4186300Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-26T10:43:31.4186631Z 
+2026-11-26T10:43:31.4186794Z HEAD is now at 8bf45ed Prove the basic divergence lemmas (#4643)
+2026-11-26T10:43:31.4190106Z ##[endgroup]
+2026-11-26T10:43:31.4232608Z [command]/usr/bin/git log -1 --format=%H
+2026-11-26T10:43:31.4258784Z 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
+2026-11-26T10:43:31.4428373Z ##[group]Run set -euo pipefail
+2026-11-26T10:43:31.4428755Z [36;1mset -euo pipefail[0m
+2026-11-26T10:43:31.4429366Z [36;1mcurl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh[0m
+2026-11-26T10:43:31.4430052Z [36;1msh elan-init.sh -y --default-toolchain none[0m
+2026-11-26T10:43:31.4430399Z [36;1mecho "$HOME/.elan/bin" >> "$GITHUB_PATH"[0m
+2026-11-26T10:43:31.4468432Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-26T10:43:31.4468792Z ##[endgroup]
+2026-11-26T10:43:31.4968458Z info: downloading installer
+2026-11-26T10:43:31.6518511Z ##[group]Run set +e
+2026-11-26T10:43:31.6518863Z [36;1mset +e[0m
+2026-11-26T10:43:31.6519078Z [36;1mset -uo pipefail[0m
+2026-11-26T10:43:31.6519350Z [36;1mmkdir -p "$GITHUB_WORKSPACE/journaux"[0m
+2026-11-26T10:43:31.6519666Z [36;1mLOG="$GITHUB_WORKSPACE/journaux"[0m
+2026-11-26T10:43:31.6520009Z [36;1mok() { sed -i "s/^$1=.*/$1=success/" "$LOG/status.env"; }[0m
+2026-11-26T10:43:31.6520474Z [36;1mecho "OPENAI=$(git -C openai-src rev-parse HEAD)" > "$LOG/commits.txt"[0m
+2026-11-26T10:43:31.6520977Z [36;1mecho "DEEPMIND=$(git -C deepmind rev-parse HEAD)" >> "$LOG/commits.txt"[0m
+2026-11-26T10:43:31.6521451Z [36;1mecho "AUDIT=$(git -C audit rev-parse HEAD)" >> "$LOG/commits.txt"[0m
+2026-11-26T10:43:31.6521915Z [36;1mfor k in CACHE BUILD REFDIFF REFERENCE BRIDGE CLASSICAL AXIOMS; do[0m
+2026-11-26T10:43:31.6522308Z [36;1m  echo "$k=failed" >> "$LOG/status.env"[0m
+2026-11-26T10:43:31.6522583Z [36;1mdone[0m
+2026-11-26T10:43:31.6522781Z [36;1mcd openai-src[0m
+2026-11-26T10:43:31.6523091Z [36;1mlean --version > "$LOG/lean-version.txt" 2>&1[0m
+2026-11-26T10:43:31.6523946Z [36;1mif lake exe cache get > "$LOG/cache.log" 2>&1; then ok CACHE; fi[0m
+2026-11-26T10:43:31.6524363Z [36;1mif lake build > "$LOG/lean-build.log" 2>&1; then[0m
+2026-11-26T10:43:31.6524672Z [36;1m  ok BUILD[0m
+2026-11-26T10:43:31.6524887Z [36;1m  mkdir -p AuditRef[0m
+2026-11-26T10:43:31.6525308Z [36;1m  # Reperage explicite dans le commit DeepMind verrouille ; echouer si absent ou ambigu.[0m
+2026-11-26T10:43:31.6525940Z [36;1m  NS_FILE="$(find ../deepmind/FormalConjectures -type f -name NavierStokes.lean | sort)"[0m
+2026-11-26T10:43:31.6526685Z [36;1m  EUCL_FILE="$(grep -rlF 'notation "ℝ^"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"[0m
+2026-11-26T10:43:31.6527546Z [36;1m  D3_FILE="$(grep -rlF 'notation "ℝ³"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"[0m
+2026-11-26T10:43:31.6528284Z [36;1m  printf 'NavierStokes: %s\nEuclidean: %s\n3d: %s\n' "$NS_FILE" "$EUCL_FILE" "$D3_FILE" > "$LOG/source-paths.txt"[0m
+2026-11-26T10:43:31.6528800Z [36;1m  GENERATED=no[0m
+2026-11-26T10:43:31.6529115Z [36;1m  if [ "$(printf '%s\n' "$NS_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&[0m
+2026-11-26T10:43:31.6529552Z [36;1m     [ "$(printf '%s\n' "$EUCL_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&[0m
+2026-11-26T10:43:31.6529981Z [36;1m     [ "$(printf '%s\n' "$D3_FILE" | sed '/^$/d' | wc -l)" -eq 1 ]; then[0m
+2026-11-26T10:43:31.6530468Z [36;1m    if python3 -I ../audit/make_reference.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \[0m
+2026-11-26T10:43:31.6530989Z [36;1m         AuditRef/Reference.lean > "$LOG/reference-generate.log" 2>&1; then[0m
+2026-11-26T10:43:31.6531376Z [36;1m      GENERATED=yes[0m
+2026-11-26T10:43:31.6531597Z [36;1m    fi[0m
+2026-11-26T10:43:31.6531781Z [36;1m  else[0m
+2026-11-26T10:43:31.6532198Z [36;1m    echo "Sources DeepMind absentes ou ambigues : transfert non execute" > "$LOG/reference-generate.log"[0m
+2026-11-26T10:43:31.6532694Z [36;1m  fi[0m
+2026-11-26T10:43:31.6532904Z [36;1m  if [ "$GENERATED" = yes ]; then[0m
+2026-11-26T10:43:31.6533238Z [36;1m    cp AuditRef/Reference.lean "$LOG/Reference.lean"[0m
+2026-11-26T10:43:31.6534159Z [36;1m    diff -u "$NS_FILE" AuditRef/Reference.lean > "$LOG/reference.diff"[0m
+2026-11-26T10:43:31.6534685Z [36;1m    # 2a. Controle independant de la transformation, puis autotest du controle.[0m
+2026-11-26T10:43:31.6535255Z [36;1m    python3 -I ../audit/check_reference_diff.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \[0m
+2026-11-26T10:43:31.6535859Z [36;1m      AuditRef/Reference.lean "$LOG/reference-diff.json" > "$LOG/reference-diff.log" 2>&1[0m
+2026-11-26T10:43:31.6536304Z [36;1m    DIFF_OK=$?[0m
+2026-11-26T10:43:31.6536701Z [36;1m    # Second controle, independant (version d'octobre : egalite exacte apres inversion).[0m
+2026-11-26T10:43:31.6537369Z [36;1m    python3 -I ../audit/check_reference_exact.py "$NS_FILE" AuditRef/Reference.lean "$EUCL_FILE" "$D3_FILE" \[0m
+2026-11-26T10:43:31.6538163Z [36;1m      "$LOG/reference-exact.json" > "$LOG/reference-exact.log" 2>&1[0m
+2026-11-26T10:43:31.6538546Z [36;1m    EXACT_OK=$?[0m
+2026-11-26T10:43:31.6538913Z [36;1m    python3 -I ../audit/test_reference_diff.py ../audit/check_reference_diff.py \[0m
+2026-11-26T10:43:31.6539561Z [36;1m      "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean > "$LOG/reference-diff-autotest.log" 2>&1[0m
+2026-11-26T10:43:31.6540069Z [36;1m    SELFTEST_OK=$?[0m
+2026-11-26T10:43:31.6540448Z [36;1m    if [ $DIFF_OK -eq 0 ] && [ $EXACT_OK -eq 0 ] && [ $SELFTEST_OK -eq 0 ]; then ok REFDIFF; fi[0m
+2026-11-26T10:43:31.6540889Z [36;1m    # 2b. Transfert verifie par le noyau.[0m
+2026-11-26T10:43:31.6541358Z [36;1m    if lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1; then ok REFERENCE; fi[0m
+2026-11-26T10:43:31.6541793Z [36;1m  fi[0m
+2026-11-26T10:43:31.6542071Z [36;1m  # 3. Pont de regularite au bord (certifie par #13, inchange).[0m
+2026-11-26T10:43:31.6542591Z [36;1m  if lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1; then ok BRIDGE; fi[0m
+2026-11-26T10:43:31.6543203Z [36;1m  # 4. Axiomes des 9 theoremes du verdict 1.[0m
+2026-11-26T10:43:31.6543933Z [36;1m  if python3 -I ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \[0m
+2026-11-26T10:43:31.6544439Z [36;1m       > "$LOG/axioms.log" 2>&1; then ok AXIOMS; fi[0m
+2026-11-26T10:43:31.6544901Z [36;1m  # Complement : pont classique (C) et (D), axiomes compris ; sans effet sur le verdict 1.[0m
+2026-11-26T10:43:31.6545468Z [36;1m  if lake env lean ../audit/ClassicalBoundary.lean > "$LOG/classical.log" 2>&1 &&[0m
+2026-11-26T10:43:31.6546038Z [36;1m     python3 -I ../audit/check_axioms.py --avec-classique "$LOG/axioms-complet.json" \[0m
+2026-11-26T10:43:31.6546662Z [36;1m       "$LOG/reference.log" "$LOG/bridge.log" "$LOG/classical.log" > "$LOG/axioms-complet.log" 2>&1; then[0m
+2026-11-26T10:43:31.6547127Z [36;1m    ok CLASSICAL[0m
+2026-11-26T10:43:31.6547376Z [36;1m  fi[0m
+2026-11-26T10:43:31.6547559Z [36;1mfi[0m
+2026-11-26T10:43:31.6547786Z [36;1mcat "$LOG/status.env"[0m
+2026-11-26T10:43:31.6548059Z [36;1mexit 0[0m
+2026-11-26T10:43:31.6584018Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-26T10:43:31.6584597Z ##[endgroup]
+2026-11-26T12:49:44.8478079Z CACHE=success
+2026-11-26T12:49:44.8479907Z BUILD=success
+2026-11-26T12:49:44.8480275Z REFDIFF=success
+2026-11-26T12:49:44.8480621Z REFERENCE=success
+2026-11-26T12:49:44.8480953Z BRIDGE=success
+2026-11-26T12:49:44.8481280Z CLASSICAL=success
+2026-11-26T12:49:44.8481641Z AXIOMS=success
+2026-11-26T12:49:44.8539578Z ##[group]Run set +e
+2026-11-26T12:49:44.8539855Z [36;1mset +e[0m
+2026-11-26T12:49:44.8540069Z [36;1mmkdir -p journaux[0m
+2026-11-26T12:49:44.8540310Z [36;1m{[0m
+2026-11-26T12:49:44.8540662Z [36;1m  (cd audit && git ls-files -z | sort -z | xargs -0 sha256sum | sed 's#  #  audit/#')[0m
+2026-11-26T12:49:44.8554719Z [36;1m  sha256sum deepmind/FormalConjectures/Millenium/NavierStokes.lean \[0m
+2026-11-26T12:49:44.8555295Z [36;1m    deepmind/FormalConjecturesForMathlib/Geometry/Euclidean.lean \[0m
+2026-11-26T12:49:44.8555804Z [36;1m    deepmind/FormalConjecturesForMathlib/Geometry/3d.lean \[0m
+2026-11-26T12:49:44.8556275Z [36;1m    openai-src/NavierStokes/ComparatorDefinitions.lean \[0m
+2026-11-26T12:49:44.8556689Z [36;1m    openai-src/NavierStokes/ComparatorSolution.lean \[0m
+2026-11-26T12:49:44.8557100Z [36;1m    openai-src/lean-toolchain openai-src/lake-manifest.json[0m
+2026-11-26T12:49:44.8557478Z [36;1m} > journaux/sources.sha256 2>&1[0m
+2026-11-26T12:49:44.8557804Z [36;1mcat journaux/sources.sha256[0m
+2026-11-26T12:49:44.8595747Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-26T12:49:44.8596103Z ##[endgroup]
+2026-11-26T12:49:44.8816318Z 5ef3841ce3849b063749d98b0cc2b1135f4b47e3eb69079cba458b5d81fc9551  audit/.github/workflows/certification.yml
+2026-11-26T12:49:44.8817661Z df9205db31d1cc3c1f1dd78552774be6cc9ce08857d2857978b88b2964a89c31  audit/BoundaryBridge.lean
+2026-11-26T12:49:44.8818871Z 5e8db606eaab41a7339bbc892e1010a8e5657d4578c45fdf631cb1474bf8dd5b  audit/ClassicalBoundary.lean
+2026-11-26T12:49:44.8819939Z fda444b82812ddc46f339bbe9b9868beaa5168e4cfea1e90eae529a454b01d7b  audit/README.md
+2026-11-26T12:49:44.8820569Z d73c3a7892de9986c1e9a84ba56b09414e35fe5063ae5c547a455b9865a3fe51  audit/check_axioms.py
+2026-11-26T12:49:44.8821229Z 0ac3449f21fd2cfa65fec5c3afa1b9ab8c0dcb206ecb6dbb76c0324c6d7eb348  audit/check_reference_diff.py
+2026-11-26T12:49:44.8822306Z 89dd8b5141158734428a20f3487b1903e0d9e0dcaa5d7802e437c47f2355255a  audit/check_reference_exact.py
+2026-11-26T12:49:44.8823696Z 214f3e7a25581df6898647c8e5ba4fee10d4c89335d389d1240f0735ba0e0030  audit/compare_definitions.py
+2026-11-26T12:49:44.8824364Z e587d6806018484da80712b5fd37b41925e6376a735389e96f584f62ee64e8df  audit/make_reference.py
+2026-11-26T12:49:44.8825045Z 066a2a7a2030a6b8324beeff01810e09d1cd9b760152c98c5ba7c8de6e9bc2c0  audit/preuves/execution-13/README.md
+2026-11-26T12:49:44.8825779Z 1880d1f69a8bf71b962f521f9c95384a3d78bf46e3c4191c8f42efd449888f20  audit/preuves/execution-13/SHA256SUMS
+2026-11-26T12:49:44.8826732Z 6b51cd7c95bffa040103ccbed17f9c018614fe842cbe1e21ea1289c4a59ceef4  audit/preuves/execution-13/axioms.json
+2026-11-26T12:49:44.8827475Z 747dac87f831fe4f9714dc3eb0b7c695fe7ced8116c2a35919e78cc9790e1f8f  audit/preuves/execution-13/certificat.json
+2026-11-26T12:49:44.8828179Z 6293d863e0327741f624a1249925dcca6c7de1c1bca43bfde43c6fc189100d61  audit/test_reference_diff.py
+2026-11-26T12:49:44.8828794Z 0576f175b3faee1be66297975dadc6978fa11919da50bdf675e845ec274d4482  audit/verdict.py
+2026-11-26T12:49:44.8829498Z f446284f2aa54375f558c263a580b34e2e7bc9f44a28829637199cc72257d25d  deepmind/FormalConjectures/Millenium/NavierStokes.lean
+2026-11-26T12:49:44.8830375Z c3c0615b00271717acd12d0b294e54bd7b1b8b5b3d63b482d3822d0bdb923ed8  deepmind/FormalConjecturesForMathlib/Geometry/Euclidean.lean
+2026-11-26T12:49:44.8831246Z 8d2fb5b192229c35ddeecc5fc5924717905707c9f8a25a4ba5fa0698b49da78f  deepmind/FormalConjecturesForMathlib/Geometry/3d.lean
+2026-11-26T12:49:44.8832079Z 8d90e0f9eee14f8b01773852083a02fd58bda59d4de2abb60d1787bbc9f6ebf4  openai-src/NavierStokes/ComparatorDefinitions.lean
+2026-11-26T12:49:44.8832891Z 52950d5d618a8d34c9bfbdb16641c81c276e97b6d7fd2a76c08577353f0b0227  openai-src/NavierStokes/ComparatorSolution.lean
+2026-11-26T12:49:44.8834040Z 8190e75a201741065fe508b28955dd64dd72d090babe5f70ce6848879d68ae88  openai-src/lean-toolchain
+2026-11-26T12:49:44.8835081Z 5ec1dc8e009008d0efb9601cd38f6ba54e753fd538b0e5f8c3e6c5ec72ee1e09  openai-src/lake-manifest.json
+2026-11-26T12:49:44.8864917Z ##[group]Run set +e
+2026-11-26T12:49:44.8865191Z [36;1mset +e[0m
+2026-11-26T12:49:44.8865490Z [36;1mD=openai-src/NavierStokes/ComparatorDefinitions.lean[0m
+2026-11-26T12:49:44.8865835Z [36;1m{[0m
+2026-11-26T12:49:44.8866089Z [36;1m  echo "=== Energie (condition 7 de Fefferman) ==="[0m
+2026-11-26T12:49:44.8866548Z [36;1m  grep -n -A14 '^structure NavierStokesExistenceAndSmoothnessRn' "$D"[0m
+2026-11-26T12:49:44.8866930Z [36;1m  echo[0m
+2026-11-26T12:49:44.8867239Z [36;1m  echo "=== Periodicite de la pression (alternative D seulement) ==="[0m
+2026-11-26T12:49:44.8867766Z [36;1m  grep -n -A16 '^structure NavierStokesExistenceAndSmoothnessPeriodic' "$D"[0m
+2026-11-26T12:49:44.8868218Z [36;1m} > journaux/extraits-enonce.txt 2>&1[0m
+2026-11-26T12:49:44.8868501Z [36;1m{[0m
+2026-11-26T12:49:44.8868934Z [36;1m  echo "=== Lemme 8.6 / eq. (8.19) : declarations citees par Bastounis-Circelli-Hansen (arXiv:2610.08144) ==="[0m
+2026-11-26T12:49:44.8869639Z [36;1m  for decl in norm_derivativeWord_inverse_le inverse_finiteJets mixedJet_inverse_bound; do[0m
+2026-11-26T12:49:44.8870282Z [36;1m    grep -n -A22 "^theorem $decl " openai-src/NavierStokes/SmoothFamilyTorusInverse.lean \[0m
+2026-11-26T12:49:44.8870822Z [36;1m      openai-src/NavierStokes/ParametricTorusInverse.lean[0m
+2026-11-26T12:49:44.8871159Z [36;1m    echo[0m
+2026-11-26T12:49:44.8871349Z [36;1m  done[0m
+2026-11-26T12:49:44.8871659Z [36;1m  echo "=== Borne de flux de pression, eq. (10.19) du PDF : forme Lean ==="[0m
+2026-11-26T12:49:44.8872128Z [36;1m  tail -n 30 openai-src/NavierStokes/R3/PressureFlux.lean[0m
+2026-11-26T12:49:44.8872605Z [36;1m  sed -n '27,55p' openai-src/NavierStokes/R3/WholeSpaceComparisonClosure.lean[0m
+2026-11-26T12:49:44.8873026Z [36;1m} > journaux/lemme-8-6.txt 2>&1[0m
+2026-11-26T12:49:44.8903726Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-26T12:49:44.8904084Z ##[endgroup]
+2026-11-26T12:49:44.9118185Z ##[group]Run set -euo pipefail
+2026-11-26T12:49:44.9118497Z [36;1mset -euo pipefail[0m
+2026-11-26T12:49:44.9118748Z [36;1mmkdir -p journaux[0m
+2026-11-26T12:49:44.9119005Z [36;1mif [ -f journaux/status.env ]; then[0m
+2026-11-26T12:49:44.9119282Z [36;1m  set -a[0m
+2026-11-26T12:49:44.9119492Z [36;1m  source journaux/status.env[0m
+2026-11-26T12:49:44.9119747Z [36;1m  set +a[0m
+2026-11-26T12:49:44.9119930Z [36;1mfi[0m
+2026-11-26T12:49:44.9120149Z [36;1mpython3 -I audit/verdict.py journaux[0m
+2026-11-26T12:49:44.9149410Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-26T12:49:44.9149923Z ##[endgroup]
+2026-11-26T12:49:44.9494079Z {
+2026-11-26T12:49:44.9494620Z   "verdict_1_certification_lean": {
+2026-11-26T12:49:44.9495484Z     "verdict": "CERTIFIÉ",
+2026-11-26T12:49:44.9498911Z     "nature": "toutes les vérifications noyau ont réussi et les pièces sont cohérentes",
+2026-11-26T12:49:44.9500140Z     "etapes": {
+2026-11-26T12:49:44.9500942Z       "cache_mathlib": "success",
+2026-11-26T12:49:44.9501459Z       "1_compilation_complete": "success",
+2026-11-26T12:49:44.9502028Z       "2a_controle_transformation_reference": "success",
+2026-11-26T12:49:44.9502579Z       "2b_enonce_deepmind_par_transfert": "success",
+2026-11-26T12:49:44.9503085Z       "3_pont_regularite_bord": "success",
+2026-11-26T12:49:44.9503897Z       "4_axiomes_noyau": "success"
+2026-11-26T12:49:44.9504339Z     }
+2026-11-26T12:49:44.9504591Z   },
+2026-11-26T12:49:44.9505632Z   "complement_pont_classique_C_D": "COMPILÉ — pont classique (C) et (D) établi ; axiomes standard, y compris 5 maillons de la chaîne d'OpenAI",
+2026-11-26T12:49:44.9506801Z   "verdict_2_correspondance_clay": {
+2026-11-26T12:49:44.9507384Z     "verdict": "À VALIDER HUMAINEMENT",
+2026-11-26T12:49:44.9507853Z     "points": [
+2026-11-26T12:49:44.9508556Z       "Fidélité de l'énoncé DeepMind au texte de Fefferman, clause par clause",
+2026-11-26T12:49:44.9509421Z       "Condition d'énergie (7) : extraits-enonce.txt",
+2026-11-26T12:49:44.9510303Z       "Périodicité de la pression, alternative (D) seulement : extraits-enonce.txt",
+2026-11-26T12:49:44.9511407Z       "Identification C^∞(ℝ³ × [0, ∞)) ⇔ prolongement lisse (théorème de Seeley), non formalisée"
+2026-11-26T12:49:44.9512119Z     ]
+2026-11-26T12:49:44.9512380Z   },
+2026-11-26T12:49:44.9512684Z   "hors_portee": [
+2026-11-26T12:49:44.9513810Z     "Correspondance entre la preuve écrite (PDF) et la preuve Lean, dont le lemme 8.6 / éq. (8.19) : lemme-8-6.txt",
+2026-11-26T12:49:44.9514951Z     "Relecture du noyau par un vérificateur indépendant (nanoda)"
+2026-11-26T12:49:44.9515488Z   ],
+2026-11-26T12:49:44.9515789Z   "commits": {
+2026-11-26T12:49:44.9516215Z     "OPENAI": "f9e8bc5b38b6e212696e8a30e3e91517af887bbd",
+2026-11-26T12:49:44.9516869Z     "DEEPMIND": "8bf45ed70d48b2b2a501de9c00b26bfa38c573ee",
+2026-11-26T12:49:44.9517511Z     "AUDIT": "bcd68a5121f2b90697c73d958e6251f6fa150758"
+2026-11-26T12:49:44.9518010Z   },
+2026-11-26T12:49:44.9518889Z   "lean": "Lean (version 4.34.0-rc2, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
+2026-11-26T12:49:44.9519849Z   "execution": {
+2026-11-26T12:49:44.9520217Z     "date_utc": "2026-11-26T12:49:44+00:00",
+2026-11-26T12:49:44.9521090Z     "github_run": "https://github.com/dominicgravel10-png/navier-stokes-audit/actions/runs/45803959668"
+2026-11-26T12:49:44.9521899Z   },
+2026-11-26T12:49:44.9522209Z   "empreintes_sha256": {
+2026-11-26T12:49:44.9522858Z     "Reference.lean": "12a8854400a87c6ff55b4ed67b1266db0cfea94045d6bdbe79f7f63c096df77b",
+2026-11-26T12:49:44.9524306Z     "axioms-complet.json": "1d412fef8e1c7875ef49fef51e64853dbee1658744e53648e89056678dc39ca4",
+2026-11-26T12:49:44.9525390Z     "axioms-complet.log": "044b9382f89947d3a839f83924e5129c198c0dcb943323479073d87a0e25c640",
+2026-11-26T12:49:44.9526427Z     "axioms.json": "6b51cd7c95bffa040103ccbed17f9c018614fe842cbe1e21ea1289c4a59ceef4",
+2026-11-26T12:49:44.9527705Z     "axioms.log": "8eb30e24e91284d2cd7b18398067537a269f2c56f7e3dc88058e746068ad76fd",
+2026-11-26T12:49:44.9528711Z     "bridge.log": "0a29e09690ef016ae3338da7475753daab5f5f9e0eda943985ab359c224fb527",
+2026-11-26T12:49:44.9529690Z     "cache.log": "18c709df32de92378ae08c2fe8c2ba9ea9cff2ac134db266ee6660ba8703e123",
+2026-11-26T12:49:44.9530689Z     "classical.log": "fd642b0bc59883db0533b0cfcd1eaf5981853a9d553c435c17fe91cfb5a72dee",
+2026-11-26T12:49:44.9531737Z     "commits.txt": "9df2c78cf9715400ce3acdc6a8dc4086f4adf006483e14d0128caf360749b688",
+2026-11-26T12:49:44.9532861Z     "extraits-enonce.txt": "11a2d43d3cbcd78a286706bc57a9ba2142d3c1a3e64d8e39c87f34993a1198d8",
+2026-11-26T12:49:44.9534380Z     "lean-build.log": "aa35ea96e34ff38694895f8dc92b92fb124dcbfc47ab56fcfa4aeae919b73ede",
+2026-11-26T12:49:44.9535453Z     "lean-version.txt": "b7a021a1958c8b845174d5d3d14f0cc46c34c4f839cef6f0286194b5f3089879",
+2026-11-26T12:49:44.9536514Z     "lemme-8-6.txt": "dbef85cff7c9a4e67418f15eba3717d8b5104bfead206a8e88a25a9265127935",
+2026-11-26T12:49:44.9537647Z     "reference-diff-autotest.log": "b794119102de78d5c2e511a8abe448b21d4b5aa9191bfc67eb372c2789e46329",
+2026-11-26T12:49:44.9538817Z     "reference-diff.json": "628567b669af4f5c9122310ecf338dba4d65075239cff21389beaf0f40dd95ef",
+2026-11-26T12:49:44.9539869Z     "reference-diff.log": "c78fd9c433e3837d446b6b71717c1f71a5bee9791a412c94c52b155e94786cc6",
+2026-11-26T12:49:44.9540954Z     "reference-exact.json": "8e741c28ef64c3e4e87f27d3f53d1b23fc11c08f0a49feed4f87015600f7d60d",
+2026-11-26T12:49:44.9542068Z     "reference-exact.log": "c2db39eb201e26be4d85ad1bd117c6672b331649821d181ad56ec0bc6d49e94e",
+2026-11-26T12:49:44.9543198Z     "reference-generate.log": "a214f7ed60ab5fb22b0bd3c9e7e160a2ba459e66694a09bf6e06d9f3e5e85483",
+2026-11-26T12:49:44.9544528Z     "reference.diff": "d5cd5b8aeda34c15df6092af4887c29d73af9277fb20c890c444d8ea7f1443a6",
+2026-11-26T12:49:44.9545577Z     "reference.log": "381318a632bca69747ff90c5d312cfcb78e014d6013b10fb86b74738b61fb1e7",
+2026-11-26T12:49:44.9546641Z     "source-paths.txt": "d57afbddcd3a82ad8ca7f083aa8bea28edddc80ffe412c4b5ace7aa588e42269",
+2026-11-26T12:49:44.9547431Z     "sources.sha256": "dc5986ec97ea2b16391a9b3738a4b1985f51a2b50c9688a437163ebb65d54b81",
+2026-11-26T12:49:44.9547980Z     "status.env": "1f1f8908ead7a47dffcd18d63d6c007a685c980864f0525617f4285a7e642b6b"
+2026-11-26T12:49:44.9548389Z   }
+2026-11-26T12:49:44.9548561Z }
+2026-11-26T12:49:44.9665567Z ##[group]Run actions/upload-artifact@v4
+2026-11-26T12:49:44.9665874Z with:
+2026-11-26T12:49:44.9666088Z   name: audit-quatre-etapes-45803959668
+2026-11-26T12:49:44.9666370Z   path: journaux/
+2026-11-26T12:49:44.9666586Z   if-no-files-found: warn
+2026-11-26T12:49:44.9666825Z   retention-days: 90
+2026-11-26T12:49:44.9667040Z   compression-level: 6
+2026-11-26T12:49:44.9667252Z   overwrite: false
+2026-11-26T12:49:44.9667461Z   include-hidden-files: false
+2026-11-26T12:49:44.9667698Z ##[endgroup]
+2026-11-26T12:49:45.1431944Z (node:29695) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-26T12:49:45.1433227Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-26T12:49:45.1544064Z With the provided path, there will be 25 files uploaded
+2026-11-26T12:49:45.1545102Z Artifact name is valid!
+2026-11-26T12:49:45.1545500Z Root directory input is valid!
+2026-11-26T12:49:45.3736225Z Beginning upload of artifact content to blob storage
+2026-11-26T12:49:45.4321214Z (node:29695) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-26T12:49:45.4898203Z Uploaded bytes 53344
+2026-11-26T12:49:45.5107421Z Finished uploading artifact content to blob storage!
+2026-11-26T12:49:45.5108575Z SHA256 digest of uploaded artifact zip is 8bf4d7fb9ce9adf1f44c4486ffecbcb7a1001c0499990524dbc3916092e3b942
+2026-11-26T12:49:45.5111144Z Finalizing artifact upload
+2026-11-26T12:49:45.8297429Z Artifact audit-quatre-etapes-45803959668.zip successfully finalized. Artifact ID 15118523749
+2026-11-26T12:49:45.8299066Z Artifact audit-quatre-etapes-45803959668 has been successfully uploaded! Final size is 53344 bytes. Artifact ID is 15118523749
+2026-11-26T12:49:45.8305449Z Artifact download URL: https://github.com/dominicgravel10-png/navier-stokes-audit/actions/runs/45803959668/artifacts/15118523749
+2026-11-26T12:49:45.8628148Z Post job cleanup.
+2026-11-26T12:49:45.9554349Z [command]/usr/bin/git version
+2026-11-26T12:49:45.9588409Z git version 2.56.1
+2026-11-26T12:49:45.9629721Z Temporarily overriding HOME='/home/runner/work/_temp/666ff98c-965a-4b35-b9e2-ad03438d808a' before making global git config changes
+2026-11-26T12:49:45.9631496Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T12:49:45.9636316Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/deepmind
+2026-11-26T12:49:45.9679346Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T12:49:45.9719853Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T12:49:46.0049511Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T12:49:46.0079867Z http.https://github.com/.extraheader
+2026-11-26T12:49:46.0093711Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-26T12:49:46.0176414Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T12:49:46.0492859Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T12:49:46.0534487Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T12:49:46.1014839Z Post job cleanup.
+2026-11-26T12:49:46.1949222Z [command]/usr/bin/git version
+2026-11-26T12:49:46.2010457Z git version 2.56.1
+2026-11-26T12:49:46.2054742Z Temporarily overriding HOME='/home/runner/work/_temp/5159120b-8327-4b05-a42d-0086c837b2cf' before making global git config changes
+2026-11-26T12:49:46.2056460Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T12:49:46.2061181Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/audit
+2026-11-26T12:49:46.2124306Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T12:49:46.2160008Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T12:49:46.2492528Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T12:49:46.2527348Z http.https://github.com/.extraheader
+2026-11-26T12:49:46.2540962Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-26T12:49:46.2609395Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T12:49:46.2918408Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T12:49:46.2955951Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T12:49:46.3442675Z Post job cleanup.
+2026-11-26T12:49:46.4310809Z [command]/usr/bin/git version
+2026-11-26T12:49:46.4360151Z git version 2.56.1
+2026-11-26T12:49:46.4405192Z Temporarily overriding HOME='/home/runner/work/_temp/f27118f2-935c-4ac4-b11d-3d7c5c0e94d6' before making global git config changes
+2026-11-26T12:49:46.4406507Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-26T12:49:46.4411236Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/navier-stokes-audit/navier-stokes-audit/openai-src
+2026-11-26T12:49:46.4453909Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-26T12:49:46.4490792Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-26T12:49:46.4822785Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-26T12:49:46.4852437Z http.https://github.com/.extraheader
+2026-11-26T12:49:46.4865827Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-26T12:49:46.4916874Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-26T12:49:46.5229041Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-26T12:49:46.5266475Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-26T12:49:46.5716741Z Cleaning up orphan processes
+2026-11-26T12:49:46.6071337Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

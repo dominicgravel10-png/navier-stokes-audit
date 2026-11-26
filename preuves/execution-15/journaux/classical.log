@@ -1,0 +1,17 @@
+'AuditClassical.differentiable_time_slice' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AuditClassical.derivWithin_Ici_eq_deriv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AuditClassical.ClassicalSolutionR3.toLean' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AuditClassical.breakdown_R3_classical' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AuditClassical.ClassicalSolutionPeriodic.toLean' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AuditClassical.breakdown_periodic_classical' depends on axioms: [propext, Classical.choice, Quot.sound]
+'NavierStokesR3.WholeSpaceUniqueness.classical_uniqueness_on_Icc' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'NavierStokesR3.WholeSpaceUniqueness.candidate_global_agrees_before_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'NavierStokesR3.ProblemStatement.CandidateProperties.no_global_solution_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'NavierStokesR3.theorem_1_1' depends on axioms: [propext, Classical.choice, Quot.sound]
+'NavierStokesR3.comparator_of_breakdown' depends on axioms: [propext, Classical.choice, Quot.sound]

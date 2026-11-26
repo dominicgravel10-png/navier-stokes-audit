@@ -20,6 +20,7 @@ Différences autorisées :
 Les énoncés de (C) et (D) et toutes les définitions doivent rester identiques au caractère près.
 """
 import difflib
+import hashlib
 import json
 import re
 import sys
@@ -182,9 +183,17 @@ def main():
         if sum(1 for t in rt if re.match(rf"^theorem {name}\b", t)) != 1:
             problems.append(f"énoncé {name} absent ou dupliqué")
 
-    report = {"ok": not problems, "problemes": problems, "differences_autorisees": allowed}
+    report = {
+        "schema_version": 1,
+        "ok": not problems,
+        "problemes": problems,
+        "differences_autorisees": allowed,
+        "source_sha256": hashlib.sha256(open(orig_p, "rb").read()).hexdigest(),
+        "generated_sha256": hashlib.sha256(open(ref_p, "rb").read()).hexdigest(),
+    }
     with open(out_p, "w", encoding="utf-8") as fh:
         json.dump(report, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     sys.exit(0 if report["ok"] else 1)
 

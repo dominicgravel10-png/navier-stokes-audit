@@ -20,6 +20,7 @@ Transformations autorisées, et rien d'autre :
   7. lignes `#print axioms` ajoutées à la fin.
 Toute autre différence, même d'un caractère, fait échouer le contrôle.
 """
+import hashlib
 import json
 import re
 import sys
@@ -104,9 +105,16 @@ def main():
         else:
             problems.append(f"longueurs différentes : {len(a)} contre {len(b)} lignes")
 
-    report = {"ok": identical and not problems, "problemes": problems}
+    report = {
+        "schema_version": 1,
+        "ok": identical and not problems,
+        "problemes": problems,
+        "source_sha256": hashlib.sha256(open(orig_p, "rb").read()).hexdigest(),
+        "generated_sha256": hashlib.sha256(open(gen_p, "rb").read()).hexdigest(),
+    }
     with open(out_p, "w", encoding="utf-8") as fh:
         json.dump(report, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     sys.exit(0 if report["ok"] else 1)
 

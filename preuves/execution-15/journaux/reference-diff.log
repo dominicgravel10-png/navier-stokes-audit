@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "problemes": [],
+  "differences_autorisees": [
+    "remplacé : import FormalConjecturesUtil",
+    "remplacé : namespace NavierStokes",
+    "attribut nettoyé : @[simp, category API, AMS 35] → @[simp]",
+    "attribut nettoyé : @[simp, category API, AMS 35] → @[simp]",
+    "attribut nettoyé : @[simp, category API, AMS 35] → @[simp]",
+    "attribut retiré entièrement (category/AMS seuls) : @[category API, AMS 35]",
+    "attribut retiré entièrement (category/AMS seuls) : @[category API, AMS 35]",
+    "stub retiré : /-- (A) Existence and smoothness of Navier–Stokes solutions on ℝ³. -/",
+    "stub retiré : @[category research open, AMS 35]",
+    "stub retiré : theorem navier_stokes_existence_and_smoothness_R3 (nu : ℝ) (hnu : nu > 0)",
+    "stub retiré :     (u₀ : ℝ³ → ℝ³) (hu₀ : InitialVelocityConditionDecay u₀) :",
+    "stub retiré :     ∃ v p, NavierStokesExistenceAndSmoothnessRn nu u₀ (f := 0) v p := by",
+    "stub retiré :   sorry",
+    "stub retiré : /-- (B) Existence and smoothness of Navier–Stokes solutions in ℝ³/ℤ³. -/",
+    "stub retiré : @[category research open, AMS 35]",
+    "stub retiré : theorem navier_stokes_existence_and_smoothness_periodic (nu : ℝ) (hnu : nu > 0)",
+    "stub retiré :     (u₀ : ℝ³ → ℝ³) (hu₀ : InitialVelocityConditionPeriodic u₀) :",
+    "stub retiré :     ∃ v p, NavierStokesExistenceAndSmoothnessPeriodic nu u₀ (f := 0) v p := by",
+    "stub retiré :   sorry",
+    "attribut retiré entièrement (category/AMS seuls) : @[category research open, AMS 35]",
+    "sorry de (C)/(D) remplacé",
+    "preuve de transfert C insérée",
+    "attribut retiré entièrement (category/AMS seuls) : @[category research open, AMS 35]",
+    "sorry de (C)/(D) remplacé",
+    "remplacé : end NavierStokes",
+    "preuve de transfert D insérée"
+  ]
+}

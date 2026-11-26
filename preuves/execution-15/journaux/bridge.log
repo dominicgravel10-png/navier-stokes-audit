@@ -1,0 +1,7 @@
+'NavierStokes.Comparator.navier_stokes_breakdown_R3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'NavierStokes.Comparator.navier_stokes_breakdown_periodic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Audit.uniqueDiffOn_halfspace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Audit.contDiffOn_of_extension' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Audit.smooth_field_of_extension' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Audit.ExtensionSolution.toLean' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Audit.breakdown_R3_extension_version' depends on axioms: [propext, Classical.choice, Quot.sound]

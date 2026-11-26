@@ -1,6 +1,6 @@
-name: Audit Navier-Stokes — quatre controles
+name: Audit Navier-Stokes — v3 contradictoire
 
-# Version 2 (après l'exécution #13, certifiée le 7 novembre 2026). Changements :
+# Version 3. Verdict 2 reste ouvert jusqu'à la fermeture humaine des obligations.
 #  * `set +e` explicite : GitHub lance bash avec -e ; sans cela, une erreur interrompait
 #    l'étape avant la collecte des journaux suivants (sans risque de faux CERTIFIÉ) ;
 #  * étape 2a : deux contrôles indépendants de Reference.lean contre l'original DeepMind
@@ -28,21 +28,23 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - name: Sources OpenAI (commit fixe)
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           repository: openai/NavierStokesAndEuler
           ref: f9e8bc5b38b6e212696e8a30e3e91517af887bbd
           path: openai-src
 
       - name: Scripts de l'audit (branche courante)
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           path: audit
 
       - name: Reference DeepMind (commit fixe)
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           repository: google-deepmind/formal-conjectures
           ref: 8bf45ed70d48b2b2a501de9c00b26bfa38c573ee
@@ -52,8 +54,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
-          sh elan-init.sh -y --default-toolchain none
+          mkdir -p journaux
+          echo 'https://raw.githubusercontent.com/leanprover/elan/55dc2814ca42ace25f05ba4dd7a43a8c701a0549/elan-init.sh' > journaux/elan-source.txt
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/55dc2814ca42ace25f05ba4dd7a43a8c701a0549/elan-init.sh -o journaux/elan-init.sh
+          (cd journaux && sha256sum elan-init.sh > elan-init.sha256)
+          sh journaux/elan-init.sh -y --default-toolchain none > journaux/elan-install.log 2>&1
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Compiler et verifier les transferts
@@ -80,12 +85,13 @@ jobs:
             NS_FILE="$(find ../deepmind/FormalConjectures -type f -name NavierStokes.lean | sort)"
             EUCL_FILE="$(grep -rlF 'notation "ℝ^"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"
             D3_FILE="$(grep -rlF 'notation "ℝ³"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"
-            printf 'NavierStokes: %s\nEuclidean: %s\n3d: %s\n' "$NS_FILE" "$EUCL_FILE" "$D3_FILE" > "$LOG/source-paths.txt"
+            printf 'NavierStokes=%s\nEuclidean=%s\n3d=%s\n' \
+              "${NS_FILE#../}" "${EUCL_FILE#../}" "${D3_FILE#../}" > "$LOG/source-paths.txt"
             GENERATED=no
             if [ "$(printf '%s\n' "$NS_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&
                [ "$(printf '%s\n' "$EUCL_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&
                [ "$(printf '%s\n' "$D3_FILE" | sed '/^$/d' | wc -l)" -eq 1 ]; then
-              if python3 -I ../audit/make_reference.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
+            if python3 -I -B ../audit/make_reference.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
                    AuditRef/Reference.lean > "$LOG/reference-generate.log" 2>&1; then
                 GENERATED=yes
               fi
@@ -96,15 +102,16 @@ jobs:
               cp AuditRef/Reference.lean "$LOG/Reference.lean"
               diff -u "$NS_FILE" AuditRef/Reference.lean > "$LOG/reference.diff"
               # 2a. Controle independant de la transformation, puis autotest du controle.
-              python3 -I ../audit/check_reference_diff.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
+              python3 -I -B ../audit/check_reference_diff.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
                 AuditRef/Reference.lean "$LOG/reference-diff.json" > "$LOG/reference-diff.log" 2>&1
               DIFF_OK=$?
               # Second controle, independant (version d'octobre : egalite exacte apres inversion).
-              python3 -I ../audit/check_reference_exact.py "$NS_FILE" AuditRef/Reference.lean "$EUCL_FILE" "$D3_FILE" \
+              python3 -I -B ../audit/check_reference_exact.py "$NS_FILE" AuditRef/Reference.lean "$EUCL_FILE" "$D3_FILE" \
                 "$LOG/reference-exact.json" > "$LOG/reference-exact.log" 2>&1
               EXACT_OK=$?
-              python3 -I ../audit/test_reference_diff.py ../audit/check_reference_diff.py \
-                "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean > "$LOG/reference-diff-autotest.log" 2>&1
+              python3 -I -B ../audit/test_reference_diff.py ../audit/check_reference_diff.py \
+                "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean \
+                "$LOG/reference-diff-autotest.json" > "$LOG/reference-diff-autotest.log" 2>&1
               SELFTEST_OK=$?
               if [ $DIFF_OK -eq 0 ] && [ $EXACT_OK -eq 0 ] && [ $SELFTEST_OK -eq 0 ]; then ok REFDIFF; fi
               # 2b. Transfert verifie par le noyau.
@@ -113,15 +120,19 @@ jobs:
             # 3. Pont de regularite au bord (certifie par #13, inchange).
             if lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1; then ok BRIDGE; fi
             # 4. Axiomes des 9 theoremes du verdict 1.
-            if python3 -I ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \
+            if python3 -I -B ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \
                  > "$LOG/axioms.log" 2>&1; then ok AXIOMS; fi
             # Complement : pont classique (C) et (D), axiomes compris ; sans effet sur le verdict 1.
             if lake env lean ../audit/ClassicalBoundary.lean > "$LOG/classical.log" 2>&1 &&
-               python3 -I ../audit/check_axioms.py --avec-classique "$LOG/axioms-complet.json" \
+               python3 -I -B ../audit/check_axioms.py --avec-classique "$LOG/axioms-complet.json" \
                  "$LOG/reference.log" "$LOG/bridge.log" "$LOG/classical.log" > "$LOG/axioms-complet.log" 2>&1; then
               ok CLASSICAL
             fi
           fi
+          (cd ../audit && python3 -I -B -m unittest discover -s tests -v) \
+            > "$LOG/contradictory-tests.log" 2>&1
+          TESTS_RC=$?
+          if [ $TESTS_RC -ne 0 ]; then echo "Tests contradictoires en échec" >> "$LOG/contradictory-tests.log"; fi
           cat "$LOG/status.env"
           exit 0
 
@@ -178,11 +189,11 @@ jobs:
             source journaux/status.env
             set +a
           fi
-          python3 -I audit/verdict.py journaux
+          python3 -I -B audit/verdict.py journaux
 
       - name: Conserver tous les journaux
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: audit-quatre-etapes-${{ github.run_id }}
           path: journaux/
