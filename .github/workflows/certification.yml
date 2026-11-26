@@ -1,5 +1,17 @@
 name: Audit Navier-Stokes — quatre controles
 
+# Version 2 (après l'exécution #13, certifiée le 7 novembre 2026). Changements :
+#  * `set +e` explicite : GitHub lance bash avec -e ; sans cela, une erreur interrompait
+#    l'étape avant la collecte des journaux suivants (sans risque de faux CERTIFIÉ) ;
+#  * étape 2a : deux contrôles indépendants de Reference.lean contre l'original DeepMind
+#    (check_reference_diff.py, check_reference_exact.py) et autotest par falsifications ;
+#  * Reference.lean, son diff et leurs empreintes conservés dans les journaux ;
+#  * complément : pont classique (C) et (D) et axiomes de 5 maillons de la chaîne d'OpenAI
+#    (ClassicalBoundary.lean), sans effet sur le verdict 1 ;
+#  * manifeste SHA-256 des sources et extraits pour la vérification humaine ;
+#  * verdict « PREUVES D'EXÉCUTION INSUFFISANTES » si une étape est ignorée ou si une
+#    pièce annoncée manque ; un échec de contrôle n'est pas confondu avec une différence.
+
 on:
   workflow_dispatch:
   push:
@@ -15,7 +27,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 240
     steps:
       - name: Sources OpenAI (commit fixe)
         uses: actions/checkout@v4
@@ -47,58 +59,113 @@ jobs:
       - name: Compiler et verifier les transferts
         shell: bash
         run: |
+          set +e
           set -uo pipefail
           mkdir -p "$GITHUB_WORKSPACE/journaux"
           LOG="$GITHUB_WORKSPACE/journaux"
+          ok() { sed -i "s/^$1=.*/$1=success/" "$LOG/status.env"; }
           echo "OPENAI=$(git -C openai-src rev-parse HEAD)" > "$LOG/commits.txt"
           echo "DEEPMIND=$(git -C deepmind rev-parse HEAD)" >> "$LOG/commits.txt"
           echo "AUDIT=$(git -C audit rev-parse HEAD)" >> "$LOG/commits.txt"
-          echo "TEXTE=skipped" > "$LOG/status.env"
-          echo "TEXTE_CONTOURNEMENT=skipped" >> "$LOG/status.env"
-          echo "CACHE=failed" >> "$LOG/status.env"
-          echo "BUILD=failed" >> "$LOG/status.env"
-          echo "REFERENCE=failed" >> "$LOG/status.env"
-          echo "BRIDGE=failed" >> "$LOG/status.env"
-          echo "AXIOMS=failed" >> "$LOG/status.env"
+          for k in CACHE BUILD REFDIFF REFERENCE BRIDGE CLASSICAL AXIOMS; do
+            echo "$k=failed" >> "$LOG/status.env"
+          done
           cd openai-src
           lean --version > "$LOG/lean-version.txt" 2>&1
-          lake exe cache get > "$LOG/cache.log" 2>&1
-          if [ $? -eq 0 ]; then
-            sed -i 's/^CACHE=.*/CACHE=success/' "$LOG/status.env"
-          fi
-          lake build > "$LOG/lean-build.log" 2>&1
-          if [ $? -eq 0 ]; then
-            sed -i 's/^BUILD=.*/BUILD=success/' "$LOG/status.env"
+          if lake exe cache get > "$LOG/cache.log" 2>&1; then ok CACHE; fi
+          if lake build > "$LOG/lean-build.log" 2>&1; then
+            ok BUILD
             mkdir -p AuditRef
-            # Reperage explicite dans le commit DeepMind verrouille.
-            # Echouer sans conclure si un fichier est absent ou ambigu.
+            # Reperage explicite dans le commit DeepMind verrouille ; echouer si absent ou ambigu.
             NS_FILE="$(find ../deepmind/FormalConjectures -type f -name NavierStokes.lean | sort)"
             EUCL_FILE="$(grep -rlF 'notation "ℝ^"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"
             D3_FILE="$(grep -rlF 'notation "ℝ³"' ../deepmind/FormalConjecturesForMathlib --include='*.lean' || true)"
             printf 'NavierStokes: %s\nEuclidean: %s\n3d: %s\n' "$NS_FILE" "$EUCL_FILE" "$D3_FILE" > "$LOG/source-paths.txt"
+            GENERATED=no
             if [ "$(printf '%s\n' "$NS_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&
                [ "$(printf '%s\n' "$EUCL_FILE" | sed '/^$/d' | wc -l)" -eq 1 ] &&
                [ "$(printf '%s\n' "$D3_FILE" | sed '/^$/d' | wc -l)" -eq 1 ]; then
-              python3 ../audit/make_reference.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean > "$LOG/reference-generate.log" 2>&1
+              if python3 -I ../audit/make_reference.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
+                   AuditRef/Reference.lean > "$LOG/reference-generate.log" 2>&1; then
+                GENERATED=yes
+              fi
             else
               echo "Sources DeepMind absentes ou ambigues : transfert non execute" > "$LOG/reference-generate.log"
             fi
-            if [ $? -eq 0 ]; then
-              lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1
-              if [ $? -eq 0 ]; then
-                sed -i 's/^REFERENCE=.*/REFERENCE=success/' "$LOG/status.env"
-              fi
+            if [ "$GENERATED" = yes ]; then
+              cp AuditRef/Reference.lean "$LOG/Reference.lean"
+              diff -u "$NS_FILE" AuditRef/Reference.lean > "$LOG/reference.diff"
+              # 2a. Controle independant de la transformation, puis autotest du controle.
+              python3 -I ../audit/check_reference_diff.py "$NS_FILE" "$EUCL_FILE" "$D3_FILE" \
+                AuditRef/Reference.lean "$LOG/reference-diff.json" > "$LOG/reference-diff.log" 2>&1
+              DIFF_OK=$?
+              # Second controle, independant (version d'octobre : egalite exacte apres inversion).
+              python3 -I ../audit/check_reference_exact.py "$NS_FILE" AuditRef/Reference.lean "$EUCL_FILE" "$D3_FILE" \
+                "$LOG/reference-exact.json" > "$LOG/reference-exact.log" 2>&1
+              EXACT_OK=$?
+              python3 -I ../audit/test_reference_diff.py ../audit/check_reference_diff.py \
+                "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean > "$LOG/reference-diff-autotest.log" 2>&1
+              SELFTEST_OK=$?
+              if [ $DIFF_OK -eq 0 ] && [ $EXACT_OK -eq 0 ] && [ $SELFTEST_OK -eq 0 ]; then ok REFDIFF; fi
+              # 2b. Transfert verifie par le noyau.
+              if lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1; then ok REFERENCE; fi
             fi
-            lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1
-            if [ $? -eq 0 ]; then
-              sed -i 's/^BRIDGE=.*/BRIDGE=success/' "$LOG/status.env"
-            fi
-            python3 ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" > "$LOG/axioms.log" 2>&1
-            if [ $? -eq 0 ]; then
-              sed -i 's/^AXIOMS=.*/AXIOMS=success/' "$LOG/status.env"
+            # 3. Pont de regularite au bord (certifie par #13, inchange).
+            if lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1; then ok BRIDGE; fi
+            # 4. Axiomes des 9 theoremes du verdict 1.
+            if python3 -I ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \
+                 > "$LOG/axioms.log" 2>&1; then ok AXIOMS; fi
+            # Complement : pont classique (C) et (D), axiomes compris ; sans effet sur le verdict 1.
+            if lake env lean ../audit/ClassicalBoundary.lean > "$LOG/classical.log" 2>&1 &&
+               python3 -I ../audit/check_axioms.py --avec-classique "$LOG/axioms-complet.json" \
+                 "$LOG/reference.log" "$LOG/bridge.log" "$LOG/classical.log" > "$LOG/axioms-complet.log" 2>&1; then
+              ok CLASSICAL
             fi
           fi
+          cat "$LOG/status.env"
           exit 0
+
+      - name: Manifeste SHA-256 des sources verifiees
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          mkdir -p journaux
+          {
+            (cd audit && git ls-files -z | sort -z | xargs -0 sha256sum | sed 's#  #  audit/#')
+            sha256sum deepmind/FormalConjectures/Millenium/NavierStokes.lean \
+              deepmind/FormalConjecturesForMathlib/Geometry/Euclidean.lean \
+              deepmind/FormalConjecturesForMathlib/Geometry/3d.lean \
+              openai-src/NavierStokes/ComparatorDefinitions.lean \
+              openai-src/NavierStokes/ComparatorSolution.lean \
+              openai-src/lean-toolchain openai-src/lake-manifest.json
+          } > journaux/sources.sha256 2>&1
+          cat journaux/sources.sha256
+
+      - name: Extraits pour verification humaine
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          D=openai-src/NavierStokes/ComparatorDefinitions.lean
+          {
+            echo "=== Energie (condition 7 de Fefferman) ==="
+            grep -n -A14 '^structure NavierStokesExistenceAndSmoothnessRn' "$D"
+            echo
+            echo "=== Periodicite de la pression (alternative D seulement) ==="
+            grep -n -A16 '^structure NavierStokesExistenceAndSmoothnessPeriodic' "$D"
+          } > journaux/extraits-enonce.txt 2>&1
+          {
+            echo "=== Lemme 8.6 / eq. (8.19) : declarations citees par Bastounis-Circelli-Hansen (arXiv:2610.08144) ==="
+            for decl in norm_derivativeWord_inverse_le inverse_finiteJets mixedJet_inverse_bound; do
+              grep -n -A22 "^theorem $decl " openai-src/NavierStokes/SmoothFamilyTorusInverse.lean \
+                openai-src/NavierStokes/ParametricTorusInverse.lean
+              echo
+            done
+            echo "=== Borne de flux de pression, eq. (10.19) du PDF : forme Lean ==="
+            tail -n 30 openai-src/NavierStokes/R3/PressureFlux.lean
+            sed -n '27,55p' openai-src/NavierStokes/R3/WholeSpaceComparisonClosure.lean
+          } > journaux/lemme-8-6.txt 2>&1
 
       - name: Verdict conservateur
         if: always()
@@ -111,12 +178,13 @@ jobs:
             source journaux/status.env
             set +a
           fi
-          python3 audit/verdict.py journaux
+          python3 -I audit/verdict.py journaux
 
       - name: Conserver tous les journaux
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: audit-quatre-etapes
+          name: audit-quatre-etapes-${{ github.run_id }}
           path: journaux/
           if-no-files-found: warn
+          retention-days: 90

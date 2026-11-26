@@ -1,0 +1,52 @@
+{
+  "verdict_1_certification_lean": {
+    "verdict": "CERTIFIÉ",
+    "nature": "toutes les vérifications noyau ont réussi",
+    "etapes": {
+      "cache_mathlib": "success",
+      "1_compilation_complete": "success",
+      "2_enonce_deepmind_par_transfert": "success",
+      "3_pont_regularite_bord": "success",
+      "4_axiomes_noyau": "success"
+    },
+    "avertissements_indicatifs": [
+      "Comparaison textuelle des définitions : différences (voir definitions.json)",
+      "Recherche textuelle : occurrences suspectes (voir contournement.txt) ; le contrôle décisif reste #print axioms"
+    ]
+  },
+  "verdict_2_correspondance_clay": {
+    "verdict": "À VALIDER HUMAINEMENT",
+    "points": [
+      "Fidélité de l'énoncé DeepMind au texte de Fefferman, clause par clause",
+      "Condition d'énergie (7) : extraits-enonce.txt",
+      "Périodicité de la pression, alternative (D) seulement : extraits-enonce.txt"
+    ]
+  },
+  "hors_portee": [
+    "Correspondance entre la preuve écrite (PDF) et la preuve Lean, dont le lemme 8.6 / éq. (8.19) : lemme-8-6.txt",
+    "Relecture du noyau par un vérificateur indépendant (nanoda)"
+  ],
+  "commits": {
+    "OPENAI": "f9e8bc5b38b6e212696e8a30e3e91517af887bbd",
+    "DEEPMIND": "8bf45ed70d48b2b2a501de9c00b26bfa38c573ee",
+    "AUDIT": "492c9a112c881bcfd5e82e0ec9960a2218566a2f"
+  },
+  "lean": "info: downloading https://releases.lean-lang.org/lean4/v4.34.0-rc2/lean-4.34.0-rc2-linux.tar.zst\ninfo: installing /home/runner/.elan/toolchains/leanprover--lean4---v4.34.0-rc2\nLean (version 4.34.0-rc2, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
+  "execution": {
+    "date_utc": "2026-11-07T06:13:38+00:00",
+    "github_run": "https://github.com/dominicgravel10-png/navier-stokes-audit/actions/runs/42338240579"
+  },
+  "empreintes_sha256": {
+    "axioms.json": "6b51cd7c95bffa040103ccbed17f9c018614fe842cbe1e21ea1289c4a59ceef4",
+    "axioms.log": "8eb30e24e91284d2cd7b18398067537a269f2c56f7e3dc88058e746068ad76fd",
+    "bridge.log": "0a29e09690ef016ae3338da7475753daab5f5f9e0eda943985ab359c224fb527",
+    "cache.log": "5ddc8a32547d12c7b456df34206572f37f29730c68424cc399e0c8bde9d85fb0",
+    "commits.txt": "f88fc691410012e9432c34e6a7febe811e14549794bfb3e6bafb635b26210350",
+    "lean-build.log": "723f1aa8fcf3646fb45d1374383f64eccbd915de361c76b6e1cd5f836f089877",
+    "lean-version.txt": "b7a021a1958c8b845174d5d3d14f0cc46c34c4f839cef6f0286194b5f3089879",
+    "reference-generate.log": "a214f7ed60ab5fb22b0bd3c9e7e160a2ba459e66694a09bf6e06d9f3e5e85483",
+    "reference.log": "381318a632bca69747ff90c5d312cfcb78e014d6013b10fb86b74738b61fb1e7",
+    "source-paths.txt": "d57afbddcd3a82ad8ca7f083aa8bea28edddc80ffe412c4b5ace7aa588e42269",
+    "status.env": "6f26371d09b8d6416967565f6c113c62bc6973c8c9a876af9fad84230b4623df"
+  }
+}
