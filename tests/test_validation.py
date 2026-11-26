@@ -59,7 +59,9 @@ class ValidationRegressionTests(unittest.TestCase):
     def test_installer_source_and_digest_are_bound_to_pinned_script(self):
         script = b"#!/bin/sh\necho elan\n"
         checksum = hashlib.sha256(script).hexdigest() + "  elan-init.sh\n"
-        self.assertEqual(validate_installer_evidence(EXPECTED_ELAN_SOURCE, script, checksum, "elan installed"), [])
+        marker = "INSTALLER_SUCCESS: elan-init.sh exited with status 0"
+        self.assertEqual(validate_installer_evidence(EXPECTED_ELAN_SOURCE, script, checksum, marker), [])
+        self.assertTrue(validate_installer_evidence(EXPECTED_ELAN_SOURCE, script, checksum, "info: downloading installer"))
         self.assertTrue(validate_installer_evidence("https://example.invalid/elan.sh", script, checksum, "elan installed"))
         self.assertTrue(validate_installer_evidence(EXPECTED_ELAN_SOURCE, script, "0" * 64 + "  elan-init.sh", "elan installed"))
 
