@@ -141,7 +141,11 @@ class ValidationRegressionTests(unittest.TestCase):
             for name in ("Reference.lean", "reference.diff", "reference-diff-autotest.log", "extraits-enonce.txt", "lemme-8-6.txt"):
                 (logs / name).write_text("fake\n", encoding="utf-8")
             env = os.environ.copy()
-            for key in ("CACHE", "BUILD", "REFDIFF", "REFERENCE", "BRIDGE", "CLASSICAL", "AXIOMS"):
+            from audit_validation import STATUS_KEYS
+            # status.env complet et cohérent avec l'environnement : le refus doit venir des
+            # pièces elles-mêmes, pas de l'absence de statuts.
+            (logs / "status.env").write_text("".join(f"{k}=success\n" for k in STATUS_KEYS), encoding="utf-8")
+            for key in STATUS_KEYS:
                 env[key] = "success"
             env.update({
                 "GITHUB_ACTIONS": "true",
@@ -154,7 +158,10 @@ class ValidationRegressionTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-I", "-B", str(verdict), str(logs)], env=env, capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             certificate = json.loads((logs / "certificat.json").read_text(encoding="utf-8"))
-            self.assertNotEqual(certificate["verdict_1_certification_lean"]["verdict"], "CERTIFIÉ")
+            v1 = certificate["verdict_1_certification_lean"]
+            self.assertNotEqual(v1["verdict"], "CERTIFIÉ")
+            self.assertEqual(v1["verdict"], "PREUVES D'EXÉCUTION INSUFFISANTES")
+            self.assertNotIn("status.env absent", v1["erreurs_validation"])
 
 
 if __name__ == "__main__":

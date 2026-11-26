@@ -39,6 +39,18 @@ CLASSICAL_THEOREMS = (
     "NavierStokesR3.theorem_1_1",
     "NavierStokesR3.comparator_of_breakdown",
 )
+WITNESS_THEOREMS = ("AuditWitness.witness_R3",)
+ENERGY_THEOREMS = ("AuditEnergy.energy_bridge",)
+# Compléments sans effet sur le verdict 1 : statut -> (fichier Lean, journal Lean,
+# rapport d'axiomes, journal du rapport, théorèmes attendus en plus des 9 du verdict 1).
+COMPLEMENTS = {
+    "CLASSICAL": ("ClassicalBoundary.lean", "classical.log", "axioms-complet.json",
+                  "axioms-complet.log", CLASSICAL_THEOREMS),
+    "WITNESS": ("ForceWitness.lean", "witness.log", "axioms-witness.json",
+                "axioms-witness.log", WITNESS_THEOREMS),
+    "ENERGY": ("EnergyBridge.lean", "energy.log", "axioms-energy.json",
+               "axioms-energy.log", ENERGY_THEOREMS),
+}
 EXTERNAL_MANIFEST_PATHS = {
     "deepmind/FormalConjectures/Millenium/NavierStokes.lean",
     "deepmind/FormalConjecturesForMathlib/Geometry/Euclidean.lean",
@@ -48,7 +60,8 @@ EXTERNAL_MANIFEST_PATHS = {
     "openai-src/lean-toolchain",
     "openai-src/lake-manifest.json",
 }
-STATUS_KEYS = ("CACHE", "BUILD", "REFDIFF", "REFERENCE", "BRIDGE", "CLASSICAL", "AXIOMS")
+STATUS_KEYS = ("CACHE", "BUILD", "GENERATION", "REFDIFF", "REFERENCE", "BRIDGE", "AXIOMS",
+               "CLASSICAL", "WITNESS", "ENERGY")
 VALID_STATUSES = {"success", "failed", "skipped"}
 
 
@@ -306,10 +319,17 @@ def parse_source_paths(text: str) -> tuple[dict[str, str], list[str]]:
     return out, errors
 
 
-def make_axioms_report(log_paths: Iterable[Path], include_classical: bool = False) -> dict[str, Any]:
-    expected = set(MAIN_THEOREMS)
+def expected_theorems(complement: str | None = None, include_classical: bool = False) -> list[str]:
+    """Théorèmes attendus : les 9 du verdict 1, plus ceux d'un complément éventuel."""
     if include_classical:
-        expected.update(CLASSICAL_THEOREMS)
+        complement = "CLASSICAL"
+    extra = list(COMPLEMENTS[complement][4]) if complement else []
+    return list(MAIN_THEOREMS) + extra
+
+
+def make_axioms_report(log_paths: Iterable[Path], include_classical: bool = False,
+                       complement: str | None = None) -> dict[str, Any]:
+    expected = set(expected_theorems(complement, include_classical))
     text_parts = [p.read_text(encoding="utf-8", errors="replace") for p in log_paths]
     text = "\n".join(text_parts)
     flat = re.sub(r"\s*\n\s*", " ", text)

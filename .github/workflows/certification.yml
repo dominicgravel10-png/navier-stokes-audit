@@ -7,7 +7,8 @@ name: Audit Navier-Stokes — v3 contradictoire
 #    (check_reference_diff.py, check_reference_exact.py) et autotest par falsifications ;
 #  * Reference.lean, son diff et leurs empreintes conservés dans les journaux ;
 #  * complément : pont classique (C) et (D) et axiomes de 5 maillons de la chaîne d'OpenAI
-#    (ClassicalBoundary.lean), sans effet sur le verdict 1 ;
+#    (ClassicalBoundary.lean) ; témoin explicite de (C) (ForceWitness.lean) ; condition
+#    d'énergie (7) en intégrale étendue (EnergyBridge.lean) ; sans effet sur le verdict 1 ;
 #  * manifeste SHA-256 des sources et extraits pour la vérification humaine ;
 #  * verdict « PREUVES D'EXÉCUTION INSUFFISANTES » si une étape est ignorée ou si une
 #    pièce annoncée manque ; un échec de contrôle n'est pas confondu avec une différence.
@@ -69,18 +70,22 @@ jobs:
           set -uo pipefail
           mkdir -p "$GITHUB_WORKSPACE/journaux"
           LOG="$GITHUB_WORKSPACE/journaux"
+          # Statuts : skipped (etape non executee) tant qu'une etape n'a pas tourne ;
+          # success ou failed seulement apres execution reelle.
           ok() { sed -i "s/^$1=.*/$1=success/" "$LOG/status.env"; }
+          ko() { sed -i "s/^$1=.*/$1=failed/" "$LOG/status.env"; }
+          res() { if [ "$2" -eq 0 ]; then ok "$1"; else ko "$1"; fi; }
           echo "OPENAI=$(git -C openai-src rev-parse HEAD)" > "$LOG/commits.txt"
           echo "DEEPMIND=$(git -C deepmind rev-parse HEAD)" >> "$LOG/commits.txt"
           echo "AUDIT=$(git -C audit rev-parse HEAD)" >> "$LOG/commits.txt"
-          for k in CACHE BUILD REFDIFF REFERENCE BRIDGE CLASSICAL AXIOMS; do
-            echo "$k=failed" >> "$LOG/status.env"
+          for k in CACHE BUILD GENERATION REFDIFF REFERENCE BRIDGE AXIOMS CLASSICAL WITNESS ENERGY; do
+            echo "$k=skipped" >> "$LOG/status.env"
           done
           cd openai-src
           lean --version > "$LOG/lean-version.txt" 2>&1
-          if lake exe cache get > "$LOG/cache.log" 2>&1; then ok CACHE; fi
-          if lake build > "$LOG/lean-build.log" 2>&1; then
-            ok BUILD
+          lake exe cache get > "$LOG/cache.log" 2>&1; res CACHE $?
+          lake build > "$LOG/lean-build.log" 2>&1; res BUILD $?
+          if grep -q '^BUILD=success' "$LOG/status.env"; then
             mkdir -p AuditRef
             # Reperage explicite dans le commit DeepMind verrouille ; echouer si absent ou ambigu.
             NS_FILE="$(find ../deepmind/FormalConjectures -type f -name NavierStokes.lean | sort)"
@@ -97,8 +102,9 @@ jobs:
                 GENERATED=yes
               fi
             else
-              echo "Sources DeepMind absentes ou ambigues : transfert non execute" > "$LOG/reference-generate.log"
+              echo "Sources DeepMind absentes ou ambigues : generation non executable" > "$LOG/reference-generate.log"
             fi
+            if [ "$GENERATED" = yes ]; then ok GENERATION; else ko GENERATION; fi
             if [ "$GENERATED" = yes ]; then
               cp AuditRef/Reference.lean "$LOG/Reference.lean"
               diff -u "$NS_FILE" AuditRef/Reference.lean > "$LOG/reference.diff"
@@ -114,21 +120,33 @@ jobs:
                 "$NS_FILE" "$EUCL_FILE" "$D3_FILE" AuditRef/Reference.lean \
                 "$LOG/reference-diff-autotest.json" > "$LOG/reference-diff-autotest.log" 2>&1
               SELFTEST_OK=$?
-              if [ $DIFF_OK -eq 0 ] && [ $EXACT_OK -eq 0 ] && [ $SELFTEST_OK -eq 0 ]; then ok REFDIFF; fi
+              if [ $DIFF_OK -eq 0 ] && [ $EXACT_OK -eq 0 ] && [ $SELFTEST_OK -eq 0 ]; then ok REFDIFF; else ko REFDIFF; fi
               # 2b. Transfert verifie par le noyau.
-              if lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1; then ok REFERENCE; fi
+              lake env lean AuditRef/Reference.lean > "$LOG/reference.log" 2>&1; res REFERENCE $?
             fi
             # 3. Pont de regularite au bord (certifie par #13, inchange).
-            if lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1; then ok BRIDGE; fi
-            # 4. Axiomes des 9 theoremes du verdict 1.
-            if python3 -I -B ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \
-                 > "$LOG/axioms.log" 2>&1; then ok AXIOMS; fi
-            # Complement : pont classique (C) et (D), axiomes compris ; sans effet sur le verdict 1.
-            if lake env lean ../audit/ClassicalBoundary.lean > "$LOG/classical.log" 2>&1 &&
-               python3 -I -B ../audit/check_axioms.py --avec-classique "$LOG/axioms-complet.json" \
-                 "$LOG/reference.log" "$LOG/bridge.log" "$LOG/classical.log" > "$LOG/axioms-complet.log" 2>&1; then
-              ok CLASSICAL
+            lake env lean ../audit/BoundaryBridge.lean > "$LOG/bridge.log" 2>&1; res BRIDGE $?
+            # 4. Axiomes des 9 theoremes du verdict 1 : seulement si leurs journaux existent.
+            if grep -q '^REFERENCE=success' "$LOG/status.env" && grep -q '^BRIDGE=success' "$LOG/status.env"; then
+              python3 -I -B ../audit/check_axioms.py "$LOG/axioms.json" "$LOG/reference.log" "$LOG/bridge.log" \
+                > "$LOG/axioms.log" 2>&1
+              res AXIOMS $?
             fi
+            # Complements, sans effet sur le verdict 1 : compilation, puis axiomes controles
+            # avec ceux du verdict 1 (seulement si le verdict 1 a ses journaux d'axiomes).
+            for spec in CLASSICAL:ClassicalBoundary:classical:axioms-complet \
+                        WITNESS:ForceWitness:witness:axioms-witness \
+                        ENERGY:EnergyBridge:energy:axioms-energy; do
+              IFS=: read -r KEY FILE STEM REPORT <<< "$spec"
+              lake env lean "../audit/$FILE.lean" > "$LOG/$STEM.log" 2>&1
+              if [ $? -ne 0 ]; then
+                ko "$KEY"
+              elif grep -q '^AXIOMS=success' "$LOG/status.env"; then
+                python3 -I -B ../audit/check_axioms.py --complement "$KEY" "$LOG/$REPORT.json" \
+                  "$LOG/reference.log" "$LOG/bridge.log" "$LOG/$STEM.log" > "$LOG/$REPORT.log" 2>&1
+                res "$KEY" $?
+              fi
+            done
           fi
           (cd ../audit && python3 -I -B -m unittest discover -s tests -v) \
             > "$LOG/contradictory-tests.log" 2>&1

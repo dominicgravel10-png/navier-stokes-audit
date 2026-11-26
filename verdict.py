@@ -15,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from audit_validation import (
     CLASSICAL_THEOREMS,
+    COMPLEMENTS,
     EXPECTED_DEEPMIND,
     EXPECTED_LEAN_COMMIT,
     EXPECTED_LEAN_VERSION,
@@ -54,7 +55,7 @@ def load_statuses(logs: Path) -> tuple[dict[str, str], list[str]]:
             continue
         values[key] = value
     if set(values) != set(STATUS_KEYS):
-        errors.append("status.env ne contient pas exactement les sept statuts")
+        errors.append(f"status.env ne contient pas exactement les {len(STATUS_KEYS)} statuts attendus")
     for key in STATUS_KEYS:
         if os.environ.get(key) != values.get(key):
             errors.append(f"statut exporté différent de status.env : {key}")
@@ -155,6 +156,11 @@ def run_reference_rechecks(root: Path, logs: Path, source_paths: dict[str, str],
     """Régénère et recontrôle le fichier transmis; ne fait pas confiance aux JSON seuls."""
     audit = root / "audit"
     openai = root / "openai-src"
+    missing = [k for k in ("NavierStokes", "Euclidean", "3d") if k not in source_paths]
+    if missing:
+        errors.append("rejeu du transfert impossible : chemins sources absents ("
+                      + ", ".join(missing) + ")")
+        return
     rel_ns = source_paths["NavierStokes"]
     rel_eucl = source_paths["Euclidean"]
     rel_3d = source_paths["3d"]
@@ -228,20 +234,27 @@ def run_reference_rechecks(root: Path, logs: Path, source_paths: dict[str, str],
         errors.append(f"rejeu du transfert impossible : {type(exc).__name__}")
 
 
-def verify_axiom_files(logs: Path, root: Path, include_classical: bool, errors: list[str]) -> None:
+def verify_axiom_files(logs: Path, root: Path, complement: str | None, errors: list[str]) -> None:
+    """Recalcule un rapport d'axiomes à partir des journaux Lean et le compare au rapport sauvé.
+    `complement` vaut None (verdict 1) ou une clé de COMPLEMENTS ; `True`/`False` restent acceptés."""
+    if complement is True:
+        complement = "CLASSICAL"
+    elif complement is False:
+        complement = None
     main_logs = [logs / "reference.log", logs / "bridge.log"]
-    if include_classical:
-        main_logs.append(logs / "classical.log")
-    output = logs / ("axioms-complet.json" if include_classical else "axioms.json")
+    if complement:
+        _, lean_log, report_name, report_log, _ = COMPLEMENTS[complement]
+        main_logs.append(logs / lean_log)
+        output, log_name = logs / report_name, report_log
+    else:
+        output, log_name = logs / "axioms.json", "axioms.log"
     try:
-        from audit_validation import make_axioms_report, validate_axioms_report
-        report = make_axioms_report(main_logs, include_classical=include_classical)
-        expected = list(MAIN_THEOREMS) + (list(CLASSICAL_THEOREMS) if include_classical else [])
-        errors.extend(validate_axioms_report(report, expected))
+        from audit_validation import expected_theorems, make_axioms_report, validate_axioms_report
+        report = make_axioms_report(main_logs, complement=complement)
+        errors.extend(validate_axioms_report(report, expected_theorems(complement)))
         saved = load_json(output)
         if saved != report:
             errors.append(f"{output.name} ne concorde pas avec les journaux Lean relus")
-        log_name = "axioms-complet.log" if include_classical else "axioms.log"
         log_text = (logs / log_name).read_text(encoding="utf-8", errors="replace")
         if json.loads(log_text) != report:
             errors.append(f"{log_name} ne concorde pas avec le rapport JSON recalculé")
@@ -274,15 +287,21 @@ def verify_negative_tests(root: Path, logs: Path, errors: list[str]) -> None:
     try:
         test_log = logs / "contradictory-tests.log"
         saved = test_log.read_bytes()
-        if b"Ran 12 tests" not in saved or not saved.rstrip().endswith(b"OK"):
-            errors.append("contradictory-tests.log n'atteste pas le succès des douze tests")
+        # Nombre attendu calculé depuis les sources des tests (méthodes test_*), et non figé :
+        # ajouter un test ne casse pas la vérification, en retirer un est détecté.
+        expected = sum(
+            len(re.findall(r"^\s+def test_\w+\(", p.read_text(encoding="utf-8"), flags=re.M))
+            for p in sorted((root / "audit" / "tests").glob("test_*.py"))
+        )
+        if expected == 0 or f"Ran {expected} tests".encode() not in saved or not saved.rstrip().endswith(b"OK"):
+            errors.append(f"contradictory-tests.log n'atteste pas le succès des {expected} tests attendus")
         replay = subprocess.run(
             [sys.executable, "-I", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
             cwd=root / "audit", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False
         )
         if replay.returncode != 0:
             errors.append("rejeu des tests contradictoires en échec")
-        normalize = lambda b: re.sub(rb"Ran (12) tests in [0-9.]+s", rb"Ran \1 tests in <TIME>", b)
+        normalize = lambda b: re.sub(rb"Ran ([0-9]+) tests? in [0-9.]+s", rb"Ran \1 tests in <TIME>", b)
         if normalize(replay.stdout) != normalize(saved):
             errors.append("contradictory-tests.log diffère du rejeu indépendant")
     except OSError as exc:
@@ -315,29 +334,47 @@ def verify_main_evidence(logs: Path, root: Path, env: dict[str, str], errors: li
     verify_negative_tests(root, logs, errors)
     replay_lean_log(root, logs, ["lake", "env", "lean", "AuditRef/Reference.lean"], "reference.log", errors)
     replay_lean_log(root, logs, ["lake", "env", "lean", "../audit/BoundaryBridge.lean"], "bridge.log", errors)
-    verify_axiom_files(logs, root, False, errors)
+    verify_axiom_files(logs, root, None, errors)
     return actual
 
 
-def verify_classical(logs: Path, root: Path, status: str) -> tuple[str, list[str]]:
+COMPLEMENT_LABELS = {
+    "CLASSICAL": "pont classique (C) et (D) et 5 maillons de la chaîne d'OpenAI",
+    "WITNESS": "témoin explicite de (C) : u° = 0, force lisse sur ℝ × ℝ³, support compact dans {t > 0}",
+    "ENERGY": "condition (7) en intégrale étendue ⇒ champs d'énergie d'OpenAI",
+}
+
+
+def verify_complement(logs: Path, root: Path, key: str, status: str) -> tuple[str, list[str]]:
+    """Vérifie un complément sans effet sur le verdict 1 : journaux présents, rejeu Lean,
+    rapport d'axiomes recalculé et identique au rapport sauvé."""
+    lean_file, lean_log, report_name, report_log, _ = COMPLEMENTS[key]
     if status == "skipped":
         return "NON EXÉCUTÉ", []
     if status == "failed":
-        return "ÉCHEC — pont classique non certifié", []
+        return f"ÉCHEC — {lean_file} non certifié", []
     if status != "success":
-        return "PREUVES INSUFFISANTES — statut invalide", ["statut CLASSICAL invalide"]
-    errors = []
-    for name in ("classical.log", "axioms-complet.json", "axioms-complet.log"):
+        return "PREUVES INSUFFISANTES — statut invalide", [f"statut {key} invalide"]
+    errors: list[str] = []
+    for name in (lean_log, report_name, report_log):
         require_file(logs, name, errors)
     if not errors:
-        verify_axiom_files(logs, root, True, errors)
-        replay_lean_log(root, logs, ["lake", "env", "lean", "../audit/ClassicalBoundary.lean"], "classical.log", errors)
-        text = (logs / "classical.log").read_text(encoding="utf-8", errors="replace")
+        verify_axiom_files(logs, root, key, errors)
+        replay_lean_log(root, logs, ["lake", "env", "lean", f"../audit/{lean_file}"], lean_log, errors)
+        text = (logs / lean_log).read_text(encoding="utf-8", errors="replace")
         if re.search(r"\berror:", text) or "sorryAx" in text:
-            errors.append("classical.log contient une erreur ou sorryAx")
+            errors.append(f"{lean_log} contient une erreur ou sorryAx")
     if errors:
-        return "PREUVES INSUFFISANTES — complément classique non validé", errors
-    return "CERTIFIÉ COMME COMPLÉMENT RESTREINT — (C) et (D)", []
+        return f"PREUVES INSUFFISANTES — {lean_file} non validé", errors
+    return f"CERTIFIÉ COMME COMPLÉMENT — {COMPLEMENT_LABELS[key]}", []
+
+
+def verify_classical(logs: Path, root: Path, status: str) -> tuple[str, list[str]]:
+    """Compatibilité avec la v3 initiale : délègue à verify_complement."""
+    verdict, errors = verify_complement(logs, root, "CLASSICAL", status)
+    if verdict.startswith("CERTIFIÉ"):
+        return "CERTIFIÉ COMME COMPLÉMENT RESTREINT — (C) et (D)", errors
+    return verdict, errors
 
 
 def classify_main(status: dict[str, str], errors: list[str], logs: Path, root: Path, env: dict[str, str]) -> tuple[str, str, dict[str, str]]:
@@ -345,6 +382,12 @@ def classify_main(status: dict[str, str], errors: list[str], logs: Path, root: P
         return "ERREUR D'INFRASTRUCTURE", "lake build a été exécuté et a échoué", {}
     if status.get("BUILD") != "success":
         return "PREUVES D'EXÉCUTION INSUFFISANTES", "compilation complète non exécutée ou statut invalide", {}
+    if status.get("GENERATION") == "failed":
+        return ("GÉNÉRATION DE LA RÉFÉRENCE IMPOSSIBLE",
+                "sources DeepMind absentes ou ambiguës, ou make_reference.py en échec : technique, "
+                "aucune conclusion (voir reference-generate.log)", {})
+    if status.get("GENERATION") != "success":
+        return "PREUVES D'EXÉCUTION INSUFFISANTES", "génération de la référence ignorée ou statut invalide", {}
     if status.get("REFDIFF") == "failed":
         for filename in ("reference-diff.json", "reference-exact.json"):
             try:
@@ -392,11 +435,26 @@ def main() -> int:
     env = dict(os.environ)
     statuses, status_errors = load_statuses(logs)
     main_errors = list(status_errors)
-    main_verdict, main_nature, actual = classify_main(statuses, main_errors, logs, root, env)
+    try:
+        main_verdict, main_nature, actual = classify_main(statuses, main_errors, logs, root, env)
+    except Exception as exc:  # garde-fou : un certificat de refus est toujours écrit
+        main_verdict = "PREUVES D'EXÉCUTION INSUFFISANTES"
+        main_nature = f"exception imprévue pendant la validation : {type(exc).__name__}"
+        main_errors.append(main_nature)
+        actual = {}
     if status_errors and main_verdict == "CERTIFIÉ":
         main_verdict = "PREUVES D'EXÉCUTION INSUFFISANTES"
         main_nature = "; ".join(status_errors)
     classical_verdict, classical_errors = verify_classical(logs, root, statuses.get("CLASSICAL", "skipped"))
+    complements = {}
+    for key in COMPLEMENTS:
+        verdict_c, errors_c = verify_complement(logs, root, key, statuses.get(key, "skipped"))
+        complements[key] = {
+            "fichier": COMPLEMENTS[key][0],
+            "objet": COMPLEMENT_LABELS[key],
+            "verdict": verdict_c,
+            "erreurs_validation": sorted(set(errors_c)),
+        }
 
     run_id = env.get("GITHUB_RUN_ID", "")
     server = env.get("GITHUB_SERVER_URL", "")
@@ -414,6 +472,10 @@ def main() -> int:
             "verdict": classical_verdict,
             "erreurs_validation": sorted(set(classical_errors)),
             "sans_effet_sur_verdict_1": True,
+        },
+        "certification_complements_separee": {
+            "sans_effet_sur_verdict_1": True,
+            "complements": complements,
         },
         "verdict_2_correspondance_clay": {
             "verdict": "À VALIDER HUMAINEMENT",
@@ -446,7 +508,10 @@ def main() -> int:
     if summary:
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write(f"# Verdict 1 — {main_verdict}\n\n{main_nature}\n\n")
-            fh.write(f"# Complément classique — {classical_verdict}\n\n")
+            fh.write("# Compléments (sans effet sur le verdict 1)\n\n")
+            for item in complements.values():
+                fh.write(f"- {item['fichier']} — {item['verdict']}\n")
+            fh.write("\n")
             fh.write("# Verdict 2 — À VALIDER HUMAINEMENT\n\n")
             for item in cert["verdict_2_correspondance_clay"]["obligations_ouvertes"]:
                 fh.write(f"- {item}\n")

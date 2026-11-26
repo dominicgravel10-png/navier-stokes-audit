@@ -1,5 +1,5 @@
 Exécution locale des tests contradictoires v3
 Date: 2026-11-26 UTC
 Commande: PYTHONDONTWRITEBYTECODE=1 python3 -I -B -m unittest discover -s tests -v
-Résultat: réussite (12 tests)
-Portée: tests Python du vérificateur, archive #13 et reproduction artificielle du faux positif; aucun test ne compile Lean.
+Résultat: réussite (22 tests : 12 initiaux, 10 de la fusion — compléments, GENERATION, étapes non exécutées)
+Portée: tests Python du vérificateur, archive #13, reproduction artificielle du faux positif et compléments; aucun test ne compile Lean.
