@@ -68,8 +68,9 @@ def validate_installer_evidence(source: str, installer: bytes, checksum: str, lo
         errors.append("empreinte de l'installateur elan incohérente")
     if not installer.startswith(b"#!/") or not installer.strip():
         errors.append("installateur elan absent ou mal formé")
-    if "elan" not in log.lower():
-        errors.append("journal d'installation elan sans preuve exploitable")
+    marker = "INSTALLER_SUCCESS: elan-init.sh exited with status 0"
+    if marker not in log:
+        errors.append("journal d'installation sans marqueur de réussite après code retour nul")
     return errors
 
 
