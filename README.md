@@ -1,120 +1,81 @@
-# Audit indépendant — Navier–Stokes, alternative (C)
-
-Audit de la formalisation Lean publiée par OpenAI le 8 septembre 2026
-(`openai/NavierStokesAndEuler`, commit `f9e8bc5b38b6e212696e8a30e3e91517af887bbd`).
+# Audit contradictoire Navier–Stokes — v3 (fusion)
 
 Auteur : Dominic Gravel — ORCID [0009-0004-2819-2902](https://orcid.org/0009-0004-2819-2902).
-Rédigé avec l'assistance de Claude (Anthropic).
+Rédigé avec l'assistance de Claude (Anthropic) et d'un second assistant pour le contre-audit.
 
-## Question posée
 
-Le théorème Lean `NavierStokes.Comparator.navier_stokes_breakdown_R3` implique-t-il
-l'alternative (C) du problème du millénaire, sans hypothèse cachée ?
+**Statut : préparation locale; aucune certification v3.** La PR #1 doit rester en brouillon. Le Verdict 2 reste ouvert et ne peut être validé par ce workflow.
 
-## Deux verdicts séparés
+## Références fixées
 
-Un succès informatique ne doit pas être présenté comme une preuve plus large que ce
-qui a été contrôlé. Le certificat contient donc deux verdicts distincts :
+- Archive v2 préservée : `../historique/navier-stokes-audit-v2-corrige.zip`, SHA-256 `aed6c3df629e547e6ff82c9dd5dc935e8d86556fd28566831395adae33b200bb`.
+- Sources OpenAI : `f9e8bc5b38b6e212696e8a30e3e91517af887bbd`.
+- Énoncé DeepMind : `8bf45ed70d48b2b2a501de9c00b26bfa38c573ee`.
+- Lean : `4.34.0-rc2`, commit `6a10ac8c22beadecabdbb0919c2b50214762f91d`.
+- Exécution historique #13 : attestations JSON et empreintes conservées sous `preuves/execution-13/`; les autres journaux d’origine ne sont plus disponibles dans l’archive historique.
 
-1. **Certification formelle Lean** — décidée par la machine.
-2. **Correspondance avec le texte Clay (Fefferman)** — toujours
-   « À VALIDER HUMAINEMENT » : aucune machine ne peut comparer un texte en langue
-   naturelle à un énoncé formel.
+## Résultat acquis : exécution #13 du 7 novembre 2026
 
-## Verdict 1 : ce que vérifie la machine
+Verdict 1 **CERTIFIÉ** ([run 42338240579](https://github.com/dominicgravel10-png/navier-stokes-audit/actions/runs/42338240579)) :
+compilation complète, transfert DeepMind (C) et (D), pont (C), 9 théorèmes limités à `propext`,
+`Classical.choice`, `Quot.sound`. `certificat.json` SHA-256 `747dac87…1e8f`, `axioms.json`
+`6b51cd7c…ef4`. Verdict 2 : À VALIDER HUMAINEMENT. Ce résultat porte sur le code de #13 seulement.
 
-Le flux `.github/workflows/certification.yml` exécute, à chaque envoi :
+## Défaut v2 reproduit
 
-| # | Vérification | Niveau |
-|---|---|---|
-| 1 | `lake build` : toutes les cibles du `lakefile.toml` (NavierStokes, Euler, ComparatorChallenges), Lean 4.34.0-rc2, dépendances verrouillées par `lake-manifest.json` | noyau |
-| 2 | L'énoncé ORIGINAL de DeepMind (`formal-conjectures`, commit `8bf45ed`, écrit avant la preuve) est recompilé, et ses alternatives (C) et (D) sont prouvées par transfert champ par champ depuis les théorèmes d'OpenAI | noyau |
-| 3 | Le pont de régularité au bord `Audit/BoundaryBridge.lean` compile | noyau |
-| 4 | `#print axioms` sur tous les théorèmes : uniquement `propext`, `Classical.choice`, `Quot.sound` | noyau |
+Avant toute modification v3, l’archive de référence a donné code de sortie `0` et `CERTIFIÉ` face aux rapports `{"ok":true}`, justificatifs `fake`, au manifeste invalide et au commit d’audit composé de quarante zéros. La reproduction et sa sortie sont dans `preuves/contre-exemple-v2/`.
 
-### Pourquoi l'étape 2 remplace une comparaison de texte
+## Contrôles v3
 
-Le script `scripts/make_reference.py` ne fait que des transformations mécaniques du
-fichier DeepMind (import, espace de noms `AuditRef`, notations recopiées de leurs
-propres fichiers, attributs de catalogage retirés) et remplace le `sorry` de (C) et
-(D) par un transfert : chaque champ de la structure DeepMind reçoit le champ
-correspondant de la structure d'OpenAI. Lean n'accepte ce transfert que si les deux
-champs sont **définitionnellement égaux**. Une seule différence de sens (par exemple
-`Ici 0` contre `Ioi 0`) fait échouer la compilation. Le diff exact du fichier généré
-contre l'original est conservé dans `reference.diff`.
+- Les rapports doivent respecter des schémas exacts, contenir la liste exhaustive des théorèmes attendus et ne dépendre que de `propext`, `Classical.choice` et `Quot.sound`.
+- Les journaux de compilation et de transfert sont obligatoires et rejoués; les rapports de transfert sont recalculés depuis les sources fixées.
+- Le manifeste doit énumérer exactement les sources attendues, sans doublon ni chemin hors espace; chaque SHA-256 est recalculé.
+- Le commit d’audit inscrit au certificat doit égaler le commit du checkout réellement exécuté (`GITHUB_SHA`). Les commits OpenAI et DeepMind sont épinglés.
+- Les actions GitHub sont appelées par SHA complet; le script d’installation elan est téléchargé depuis un commit fixe, conservé, et son empreinte est contrôlée.
+- Les compléments sont certifiés séparément, sans effet sur le verdict Lean principal :
+  `ClassicalBoundary.lean` (pont classique (C) et (D), onze théorèmes), `ForceWitness.lean`
+  (témoin explicite de (C) : u° = 0, force lisse sur tout ℝ × ℝ³, support compact dans {t > 0}),
+  `EnergyBridge.lean` (condition (7) en intégrale étendue ⇒ champs d'énergie d'OpenAI).
+- Une étape non exécutée est `skipped`, jamais `failed` ; la génération de la référence est une
+  étape distincte (`GENERATION`). Les verdicts d'échec ne portent que sur des étapes exécutées.
+- Les tests négatifs vérifient le faux positif v2, les rapports tronqués, les SHA incorrects, les commits fictifs, les listes de théorèmes modifiées et les axiomes non autorisés.
+- L’archive historique v2 et les preuves #13 sont conservées sans modification.
 
-La comparaison textuelle et la recherche de `sorry` par `grep` restent présentes,
-mais seulement comme **avertissements indicatifs**.
+## Fusion des deux v3 (26 novembre 2026)
 
-### Pourquoi `#print axioms` est le contrôle décisif
+Base : la v3 du contre-audit (vérificateur `audit_validation.py`, schémas stricts, rejeu).
+Ajouts de la v3 de Claude : `ForceWitness.lean`, `EnergyBridge.lean`, statuts `GENERATION`,
+`WITNESS`, `ENERGY`, table générique `COMPLEMENTS`, analyse clause par clause de `VERDICT-2.md`.
+Défauts corrigés pendant la fusion :
+- `verdict.py` plantait (`KeyError`) sur des pièces fabriquées avec un `status.env` complet, sans
+  écrire de certificat ; il écrit désormais toujours un certificat de refus ;
+- le nombre de tests attendu était figé à douze ; il est calculé depuis les sources des tests ;
+- le test du faux positif v2 passait sans `status.env` : il fournit maintenant des statuts
+  complets, pour que le refus vienne des pièces elles-mêmes.
+Tests locaux : 22 sur 22. Simulation du workflow avec de faux outils Lean : statuts et
+compléments conformes ; aucune compilation Lean réelle n'a été faite hors CI.
 
-`#print axioms` parcourt la fermeture complète des dépendances vérifiées par le
-noyau. Tout `sorry` y apparaît comme `sorryAx`, tout `native_decide` comme
-`Lean.ofReduceBool`, tout axiome ajouté sous son nom. Les attributs
-`implemented_by` et `@[extern]` n'affectent pas les preuves vérifiées par le noyau.
+## Ce que le certificat ne tranchera pas
 
-### Lecture du verdict 1
+La machine vérifie des énoncés Lean, pas leur équivalence complète au texte naturel de Clay ni la fidélité de la preuve écrite au terme Lean. Le rapport humain et les obligations ouvertes sont dans [`VERDICT-2.md`](VERDICT-2.md); leur état scientifique et la veille bibliographique sont dans [`RAPPORT-SCIENTIFIQUE-v3.md`](RAPPORT-SCIENTIFIQUE-v3.md).
 
-| Verdict | Signification |
-|---|---|
-| `CERTIFIÉ` | Les quatre vérifications noyau ont réussi. |
-| `ÉCART D'ÉNONCÉ` | L'énoncé DeepMind ne se déduit pas de celui d'OpenAI. Lire `reference.log` : une erreur du script reste possible. |
-| `AXIOME NON STANDARD` | Hypothèse cachée. |
-| `ERREUR D'INFRASTRUCTURE` | Réseau, cache ou compilation. Aucune conclusion mathématique. |
-| `ERREUR DU LEMME D'AUDIT` | Notre pont ne compile pas. OpenAI n'est pas mis en cause. |
+Un `CERTIFIÉ` ultérieur signifiera seulement que les contrôles formels et leurs pièces ont été confirmés pour l’exécution précisément identifiée. Il ne fermera pas le Verdict 2.
 
-## Le pont de régularité au bord
+## Exécution historique #15 examinée
 
-La définition Lean impose `ContDiffOn ℝ ∞ (↿v) (univ ×ˢ Ici 0)` : régularité
-directement sur le demi-espace fermé `t ≥ 0`, dérivées à droite en `t = 0`.
+Le run GitHub Actions #15 est terminé avec succès. Son artefact a été conservé sous `preuves/execution-15/`; son SHA-256 est `8bf4d7fb9ce9adf1f44c4486ffecbcb7a1001c0499990524dbc3916092e3b942`. La certification affichée concerne le commit d’audit de fusion `bcd68a5121f2b90697c73d958e6251f6fa150758`, pas les fichiers v3 préparés ici. L’examen indépendant est consigné dans `preuves/execution-15/examen-independant.md`.
 
-L'alternative (C) est un énoncé de **non-existence**. Exiger moins des solutions
-exclues rend l'énoncé plus fort. Il suffit donc que toute solution lisse par
-extension au-delà de `t = 0` soit admissible au sens Lean.
+Les neuf théorèmes du verdict principal et les vingt du rapport complémentaire ont les noms attendus et utilisent seulement les axiomes standards. Les empreintes de tous les fichiers de l’artefact concordent, les 22 entrées du manifeste source ont été rehachées à partir des commits Git épinglés, et `Reference.lean` a été régénéré octet pour octet. Le Verdict 2 demeure « À VALIDER HUMAINEMENT ».
 
-`ExtensionSolution` énonce chaque condition séparément ((1), (2), (3), (7)) et
-n'exprime la régularité (6) que par l'existence d'extensions lisses. Elle **ne
-contient pas** la définition d'OpenAI. Le théorème `ExtensionSolution.toLean` doit
-donc réellement établir `velocity_smooth` et `pressure_smooth` à partir des
-extensions, par le lemme `smooth_field_of_extension`. **Le théorème d'extension de
-Seeley n'est pas nécessaire**, et le dépôt OpenAI n'y fait aucune référence.
+Deux constats complémentaires (Claude, 26 novembre) :
+- `Reference.lean` de #15 a pour SHA-256 `12a88544…f77b`, identique à la régénération faite
+  indépendamment hors CI le matin même à partir de DeepMind `8bf45ed` : deux chaînes distinctes
+  aboutissent au même fichier ;
+- la copie de `journaux/lean-build.log` versée au commit `804fa69` était corrompue (contenu
+  binaire, empreinte non conforme à `SHA256SUMS`) ; elle est remplacée par la copie de
+  l'artefact GitHub, dont l'empreinte `aa35ea96…3ede` concorde avec le certificat
+  (2 668 lignes, « Build completed successfully (11424 jobs) »).
+Ce run est aussi la première compilation réelle de `ClassicalBoundary.lean` : ses 11 théorèmes
+n'utilisent que les trois axiomes standard.
 
-## Verdict 2 : correspondance avec le texte Clay
-
-### Condition d'énergie (7)
-
-Fefferman : `∫ |u(x,t)|² dx < C` pour tout `t ≥ 0`.
-Lean : `integrable : ∀ t ≥ 0, MemLp (‖v · t‖) 2` et
-`globally_bounded_energy : ∃ E, ∀ t ≥ 0, (∫ x, ‖v x t‖ ^ 2) < E`.
-
-En Lean, l'intégrale d'une fonction non intégrable vaut 0 par convention ; sans le
-champ `MemLp`, la borne serait vide de sens. Avec lui, les deux conditions réunies
-équivalent à (7). **Analyse : fidèle.**
-
-### Périodicité de la pression
-
-Ajoutée seulement dans l'alternative (D), conformément à l'errata du document Clay.
-Elle restreint la classe de solutions exclues, donc (D) formalisée est légèrement
-plus faible qu'une lecture littérale. **L'alternative (C) n'est pas touchée.**
-
-## Hors portée : la preuve écrite
-
-Bastounis, Circelli et Hansen (arXiv:2610.08144) montrent que
-`norm_derivativeWord_inverse_le` utilise `m + 5` dérivées au lieu de `m + 4`, une série
-en `(1+|k₁|+|k₂|)⁻⁴` au lieu de `(1+|k|)⁻³`, et un seul multi-indice au lieu du supremum.
-La version Lean est strictement plus faible que l'équation (8.19) du PDF.
-
-C'est un écart entre la preuve écrite et la preuve Lean, pas une erreur de l'énoncé
-final : le noyau a vérifié que (C) découle de ce qui a été formalisé. En revanche,
-(8.19) tel qu'écrit dans le PDF n'est pas certifié par Lean. Les auteurs ne
-prétendent pas que le théorème Lean est faux.
-
-Aussi hors portée : la relecture du noyau par un vérificateur indépendant (nanoda).
-
-## Sources
-
-- OpenAI, *On the Navier–Stokes Millennium Prize Problem* (8 sept. 2026)
-- `github.com/openai/NavierStokesAndEuler`, commit `f9e8bc5`
-- `github.com/google-deepmind/formal-conjectures`, commit `8bf45ed`
-- C. Fefferman, *Existence and smoothness of the Navier–Stokes equation*, Clay Mathematics Institute
-- A. Bastounis, F. Circelli, A. C. Hansen, *Navier–Stokes lost in translation*, arXiv:2610.08144
+Ce run précède les corrections v3 : il n’atteste donc ni les tests contradictoires permanents, ni l’installation épinglée, ni les nouveaux contrôles anti-faux-positif. Aucune certification v3 n’est affirmée. La PR #1 demeure en brouillon.

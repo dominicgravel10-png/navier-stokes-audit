@@ -1,0 +1,21 @@
+{
+  "run_id": 45803959668,
+  "job_id": 139854171849,
+  "depot": "dominicgravel10-png/navier-stokes-audit",
+  "date_utc": "2026-11-26T12:49:44Z",
+  "statut": "completed",
+  "conclusion": "success",
+  "commit_audit": "bcd68a5121f2b90697c73d958e6251f6fa150758",
+  "verdict_principal": "CERTIFIÉ",
+  "verdict_2": "À VALIDER HUMAINEMENT",
+  "artefact_sha256": "8bf4d7fb9ce9adf1f44c4486ffecbcb7a1001c0499990524dbc3916092e3b942",
+  "manifest_source": "22/22 empreintes rehachées indépendamment",
+  "empreintes_certificat": "toutes concordantes",
+  "reference_lean": "régénéré identique octet pour octet",
+  "limites": [
+    "exécution antérieure aux corrections v3",
+    "pas de tests contradictoires v3 dans le run",
+    "pas de nanoda dans le run",
+    "verdict 2 humain toujours ouvert"
+  ]
+}

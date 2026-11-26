@@ -1,0 +1,167 @@
+{
+  "theoremes": {
+    "NavierStokes.Comparator.navier_stokes_breakdown_R3": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokes.Comparator.navier_stokes_breakdown_periodic": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "Audit.uniqueDiffOn_halfspace": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "Audit.contDiffOn_of_extension": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "Audit.smooth_field_of_extension": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "Audit.ExtensionSolution.toLean": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "Audit.breakdown_R3_extension_version": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditRef.navier_stokes_breakdown_R3": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditRef.navier_stokes_breakdown_periodic": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.differentiable_time_slice": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.derivWithin_Ici_eq_deriv": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.ClassicalSolutionR3.toLean": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.breakdown_R3_classical": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.ClassicalSolutionPeriodic.toLean": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "AuditClassical.breakdown_periodic_classical": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokesR3.WholeSpaceUniqueness.classical_uniqueness_on_Icc": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokesR3.WholeSpaceUniqueness.candidate_global_agrees_before_one": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokesR3.ProblemStatement.CandidateProperties.no_global_solution_one": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokesR3.theorem_1_1": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    },
+    "NavierStokesR3.comparator_of_breakdown": {
+      "axiomes": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "hors_standard": []
+    }
+  },
+  "sorry": false,
+  "erreurs_lean": 0,
+  "ok": true
+}

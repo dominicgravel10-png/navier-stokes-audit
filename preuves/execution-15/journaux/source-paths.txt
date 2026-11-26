@@ -1,0 +1,3 @@
+NavierStokes: ../deepmind/FormalConjectures/Millenium/NavierStokes.lean
+Euclidean: ../deepmind/FormalConjecturesForMathlib/Geometry/Euclidean.lean
+3d: ../deepmind/FormalConjecturesForMathlib/Geometry/3d.lean

@@ -1,0 +1,11 @@
+Examen indépendant de l’artefact GitHub Actions #15
+PASS — digest de l’artefact conforme au digest publié par GitHub.
+PASS — toutes les empreintes intégrées à certificat.json concordent avec les fichiers extraits (24 pièces).
+PASS — status.env contient les sept statuts success.
+PASS — axioms.json contient exactement 9 théorèmes attendus; axiomes limités aux trois axiomes standards; aucun sorry ni erreur.
+PASS — axioms-complet.json contient exactement 20 théorèmes attendus (9 principaux + 11 classiques); axiomes limités aux trois axiomes standards; aucun sorry ni erreur.
+PASS — les 22 empreintes de sources.sha256 ont été recalculées contre le contenu obtenu depuis les trois commits Git épinglés.
+PASS — make_reference.py régénère Reference.lean identique octet pour octet (SHA-256 12a8854400a87c6ff55b4ed67b1266db0cfea94045d6bdbe79f7f63c096df77b).
+LIMIT — run #15 utilise la révision antérieure de la PR; ce résultat ne valide pas la v3 locale.
+LIMIT — le run ne comprend pas les tests négatifs permanents ajoutés en v3, les références d’installation épinglées de v3, ni une exécution nanoda.
+LIMIT — Verdict 2 reste À VALIDER HUMAINEMENT; le certificat lui-même le dit explicitement.
