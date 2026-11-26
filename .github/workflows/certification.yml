@@ -59,6 +59,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/55dc2814ca42ace25f05ba4dd7a43a8c701a0549/elan-init.sh -o journaux/elan-init.sh
           (cd journaux && sha256sum elan-init.sh > elan-init.sha256)
           sh journaux/elan-init.sh -y --default-toolchain none > journaux/elan-install.log 2>&1
+          printf '%s\n' 'INSTALLER_SUCCESS: elan-init.sh exited with status 0' >> journaux/elan-install.log
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Compiler et verifier les transferts
